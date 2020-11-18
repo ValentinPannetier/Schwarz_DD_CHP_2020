@@ -1,7 +1,7 @@
 OUTPUT_DIRECTORY        = @CMAKE_SOURCE_DIR@/docs/doc_doxygen
 INPUT                   = @CMAKE_SOURCE_DIR@/src/lyra
 EXCLUDE_PATTERNS        = *.txt
-PROJECT_NAME            = "Soliton"
+PROJECT_NAME            = "Lyra"
 GENERATE_MAN            = YES
 QUIET                   = YES
 WARNINGS                = YES
@@ -29,7 +29,7 @@ HIDE_IN_BODY_DOCS       = NO
 INLINE_INHERITED_MEMB   = NO
 WARN_IF_UNDOCUMENTED    = YES
 ENABLE_PREPROCESSING    = YES
-MACRO_EXPANSION         = YES
+MACRO_EXPANSION         = NO
 EXPAND_ONLY_PREDEF      = NO
 SHOW_NAMESPACES         = YES
 SHOW_INCLUDE_FILES      = YES
