@@ -2,7 +2,11 @@
 file(GLOB_RECURSE LYRA_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 file(GLOB_RECURSE LYRA_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
 
-add_executable (Lyra ${LYRA_SOURCE_FILES} ${LYRA_HEADER_FILES})
+add_executable(Lyra ${LYRA_SOURCE_FILES} ${LYRA_HEADER_FILES})
+target_link_libraries(Lyra ${MPI_LIBRARIES})
+
+set_target_properties(Lyra PROPERTIES COMPILE_FLAGS "${MPI_COMPILE_FLAGS} ${CMAKE_CXX_FLAGS}")
+set_target_properties(Lyra PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS}")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
