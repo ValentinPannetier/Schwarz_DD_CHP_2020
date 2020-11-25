@@ -1,6 +1,7 @@
 #ifndef TOOLS_HPP
 #define TOOLS_HPP
 
+#include <ostream>
 #include <vector>
 
 template <typename T>
@@ -16,4 +17,12 @@ apply_permutation (std::vector<T> & in, const std::vector<ul_t> & permu)
     return;
 }
 
+template <typename T>
+std::ostream &
+operator<< (std::ostream & stream, const std::vector<T> & vec)
+{
+    for (T value : vec)
+        stream << value << " " << std::flush;
+    return stream;
+}
 #endif  // TOOLS_HPP

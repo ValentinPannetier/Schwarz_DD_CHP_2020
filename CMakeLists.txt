@@ -21,7 +21,7 @@ set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/libs)
 
-find_package(Boost COMPONENTS filesystem system unit_test_framework REQUIRED)
+# find_package(Boost COMPONENTS filesystem system unit_test_framework REQUIRED)
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 

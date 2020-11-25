@@ -8,6 +8,7 @@
 #include "IO/io.hpp"
 #include "LyraMPI/lyrampi.hpp"
 #include "SparseMatrix/sparsematrix.hpp"
+#include "Tools/tools.hpp"
 #include "lyra_common.hpp"
 
 static error_t error;
@@ -78,12 +79,11 @@ main (int argc, char ** argv)
         matrix.PrintDenseView ();
 
         std::vector<real_t> vec = {1, 1, 1};
+        std::cout << "Multiplié par : " << vec << std::endl;
 
         auto out = matrix * vec;
 
-        for (real_t value : out)
-            std::cout << value << " ";
-        std::cout << std::endl;
+        std::cout << out << std::endl;
     }
 
     if (argc < 2)

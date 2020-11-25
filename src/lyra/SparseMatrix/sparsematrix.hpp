@@ -6,8 +6,8 @@
 #include <numeric>
 #include <vector>
 
+#include "../Tools/tools.hpp"
 #include "../lyra_common.hpp"
-#include "tools.hpp"
 
 template <typename T>
 class Triplet
