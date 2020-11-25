@@ -1,5 +1,5 @@
   #include "partitions.h"
-
+  #include <string>
 
   using namespace std ; 
 
@@ -108,25 +108,38 @@
                   end = boundary_global_indices[i+2] ; 
                   proc= "proc_num_"+to_string(i)+".In" ;
                   ofstream write_mesh(proc.c_str()) ;
-                  write_mesh<<"nlines"<<endl ; 
-                  write_mesh<<num_lines<<endl ; 
-                  write_mesh<<"start"<<endl ;
-                  write_mesh<<start<<endl ;
-                  write_mesh<<"end"<<endl ;
-                  write_mesh<<end<<endl ; 
+                  write_mesh<<num_lines*(end-start+1)<<endl ; 
                   for (int j=start ; j<=end ; j++)
                   {
-                    for (int k=0 ; k<num_lines ; k++)
+                    if (j==start) //bord gauche physique
                     {
-                      write_mesh<<j*delta_x<<" "<<k*delta_y<<endl ; 
+                      for (int k=0 ; k<num_lines; k++) 
+                        {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<5<<" "<<0<<endl ;}     
                     }
-                  }
-                  write_mesh<<"**************************"<<endl ; 
-                  write_mesh<<"R"<<endl ;
-                for (int j=0 ; j<num_lines ; j++)
-                {
-                write_mesh<<(column_to_send_right-start)*num_lines+j<<endl ; 
-                }
+                    else if (j==end) //bord de droite fictif
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}} 
+                    }
+                    else if (j==column_to_send_right) 
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}}  
+                    }
+                    else 
+                    {
+                        for (int k=0 ; k<num_lines;k++)
+                        {
+                          {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<-1<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}} 
+                        }
+                    }
+                   }
               }
               
               else if (i==num_procs-1)
@@ -137,25 +150,39 @@
                   end = boundary_global_indices[2*(i-1)+3] ;
                   proc =  "proc_num_"+ to_string(i) + ".In" ; 
                   ofstream write_mesh(proc.c_str()) ;
-                  write_mesh<<"nlines"<<endl ; 
-                  write_mesh<<num_lines<<endl ; 
-                  write_mesh<<"start"<<endl ;
-                  write_mesh<<start<<endl ;
-                  write_mesh<<"end"<<endl ;
-                  write_mesh<<end<<endl ; 
+                   write_mesh<<num_lines*(end-start+1)<<endl ; 
                   for (int j=start ; j<=end ; j++)
                   {
-                    for (int k=0 ; k<num_lines ; k++)
+                    if (j==start) //bord gauche fictif
                     {
-                      write_mesh<<k*delta_y<<" "<<j*delta_x<<endl ; 
+                      for (int k=0 ; k<num_lines; k++) 
+                        {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<5<<" "<<0<<endl ;}     
                     }
-                  }
-                  write_mesh<<"************************************************"<<endl ;
-                  write_mesh<<"L"<<endl ; 
-                  for (int j=0 ; j<num_lines ; j++)
-                  {
-                    write_mesh <<(column_to_send_left-start)*num_lines+j<<endl ; 
-                  }	
+                    else if (j==end) //bord de droite physique
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}} 
+                    }
+                    else if (j==column_to_send_left) 
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i-1<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i-1<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i-1<<endl ;}}  
+                    }
+                    else 
+                    {
+                        for (int k=0 ; k<num_lines;k++)
+                
+                          {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<-1<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;} }
+            
+                    }
+                   
+              }
               }
               
         else
@@ -168,37 +195,51 @@
           end = boundary_global_indices[2*(i-1)+3] ;
           proc= "proc_num_" + to_string(i) + ".In" ;
           ofstream write_mesh(proc.c_str()) ;
-          write_mesh<<"nlines"<<endl ; 
-          write_mesh<<num_lines<<endl ; 
-          write_mesh<<"start"<<endl ; 
-          write_mesh<<start<<endl ;
-          write_mesh<<"end"<<endl ;
-          write_mesh<<end<<endl ;
           for (int j=start ; j<=end ; j++)
-          {
-            for (int k=0 ; k<num_lines ; k++)
-            {
-              write_mesh<<k*delta_y<<" "<<j*delta_x<<endl ; 
-            }
-          }
-          write_mesh<<"************************************************************"<<endl ;
-          write_mesh<<"L"<<endl ;
-          for (int j=0 ; j< num_lines ; j++)
-          {
-            write_mesh<<(column_to_send_left-start)*num_lines+j<<endl ; 
-          }
-          write_mesh<<"************************************************************"<<endl ;
-          write_mesh<<"R"<<endl ;
-          for (int j=0 ; j<num_lines ; j++)
-          {
-            write_mesh<<(column_to_send_right-start)*num_lines+j<<endl ; 
-          }
-                              
-        }
+              {
+                    if (j==start) //bord gauche physique
+                    {
+                      for (int k=0 ; k<num_lines; k++) 
+                        {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<5<<" "<<0<<endl ;}     
+                    }
+                    else if (j==end) //bord de droite fictif
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<0<<endl ;}} 
+                    }
+                    else if (j==column_to_send_left) 
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<1<<" "<<i-1<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<1<<" "<<i-1<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<-1<<" "<<1<<" "<<i-1<<endl ;}}  
+                    }
+                    else if (j==column_to_send_right) 
+                    {
+                      for (int k=0 ; k<num_lines;k++) 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<" "<<-1<<" "<<1<<" "<<i+1<<endl ;}}  
+                    }
+                    else 
+                    {
+                        for (int k=0 ; k<num_lines;k++)
+                
+                          {if (k==0){write_mesh<<k*delta_y<<" "<<k+j*num_lines<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==1){write_mesh<<k*delta_y<<" "<<k+j*num_lines<<" "<<j*delta_x<<" "<<-1<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<k+j*num_lines<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;} }
+            
+                    }
+                   
+              }
+          
       } 
-    }
+          }
   }
-
+  }
+/*
   bool compare_string(string str1 , string str2)
   {
     if (str1[0]==str2[0])
@@ -210,9 +251,10 @@
         return false;
       }
   }
-
+*/
   //taille indices_to_send_right ny ou 0 si rank = num_procs -1  
   //taille indices_to_send_left ny  ou 0 si rank = 0 
+  /*
   void read_mesh(int num_procs ,int num_proc , int* nx_local , int* indices_to_send_right , int* indices_to_send_left) 
   {
     string file_name ; 
@@ -259,4 +301,4 @@
         read_file>>indices_to_send_right[i] ;
       }
     }
-  }
+  }*/
