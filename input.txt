@@ -1,0 +1,10 @@
+nx
+10
+ny
+10
+num_procs
+3
+recovery
+2
+cut_plan
+v

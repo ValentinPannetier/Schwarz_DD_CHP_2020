@@ -1,0 +1,194 @@
+#include "partitions.h"
+
+
+using namespace std ; 
+
+void charge(int me, int n, int np, int& iBeg, int& iEnd)
+{
+    
+    int r = n % np;
+    if (me < r) {
+        iBeg = me*(n/np + 1);
+        iEnd = iBeg + (n/np + 1) - 1;
+    }
+    else {
+        iBeg = r + me * (n/np);
+        iEnd = iBeg + (n/np) - 1;
+    }
+    
+}
+
+
+//taille de boundary_global_indices = 2*num_proc 
+//taille de column_indexes_to_send = 2*num_proc-2
+
+void partitions(int num_points ,int num_procs, int recovery_size , int* boundary_global_indices)
+{
+    int partitionning1 , partitionning2 ; 
+    if (recovery_size%2 ==0) 
+    {
+        partitionning1 = recovery_size/2 ;
+        partitionning2 = recovery_size/2 ;
+    }
+    else
+    {
+        partitionning1 = recovery_size/2 + recovery_size%2 ; 
+        partitionning2 = recovery_size/2 ; 
+    }
+    
+    
+    int break_points[num_procs+1] ; 
+    break_points[0] = 0 ;  
+
+    int i_beg ; 
+    int i_end ; 
+    int i ; 
+    
+    for (i=0 ; i<num_procs ; i++) 
+    {
+        charge(i,num_points,num_procs,i_beg,i_end) ;  
+        break_points[i+1] = i_end ;                  
+    }
+
+   
+    boundary_global_indices[0] = 0 ; 
+    for (i=1 ; i<num_procs ; i++) 
+    {
+        boundary_global_indices[2*i-1] = break_points[i] -partitionning1 ;
+        boundary_global_indices[2*i] = break_points[i] + partitionning2 ; 
+    }
+    boundary_global_indices[2*num_procs-1] = num_points-1 ;    
+}
+
+void build_meshes(string input)
+{
+    ifstream read_input(input.c_str()) ;
+
+    int num_procs ; 
+    int num_cols ; 
+    int num_lines ; 
+    int recovery_size ; 
+    string cut_off_plan ;
+    
+    if(read_input)
+    {
+        read_input>>cut_off_plan ; 
+        read_input>>num_lines ; 
+        read_input>>cut_off_plan ;
+        read_input>>num_cols ; 
+        read_input>>cut_off_plan ; 
+        read_input>>num_procs ; 
+        read_input>>cut_off_plan ; 
+        read_input>>recovery_size ; 
+        read_input>>cut_off_plan ; 
+        read_input>>cut_off_plan ;
+    } 
+    else
+    {
+        cout<<"ERROR: can't open file"<<endl ;
+    }
+
+    float delta_x , delta_y ;
+    delta_x = 1../num_cols ;
+    delta_y = 1./num_lines ; 
+
+    int* boundary_global_indices=new int[2*num_procs] ; 
+    string proc = "proc_num_" ; 
+    if (cut_off_plan=="v") 
+    {
+        partitions(num_cols, num_procs,recovery_size, boundary_global_indices) ;
+        int start , end ; 
+        for (int i=0 ; i<num_procs ; i++) 
+        {
+            if (i==0) 
+            {
+                int column_to_send_right ; 
+                start = boundary_global_indices[i] ; 
+                column_to_send_right = boundary_global_indices[i+1] ; 
+                end = boundary_global_indices[i+2] ; 
+		proc+=to_float(i) ;
+		ofstream write_mesh(proc.c_str()) ;
+		read_mesh<<"start"<<endl ;
+		read_mesh<<start<<endl ;
+		read_mesh<<"end"<<endl ;
+		read_mesh<<end<<endl ; 
+	        for (int j=start ; j<=end , j++)
+		  {
+		    for (int k=0 ; k<num_lines ; k++)
+		      {
+			write_mesh<<k*delta_y<<" "<<j*delta_x<<endl ; 
+		      }
+		  }
+		write_mesh<<"**************************"<<endl ; 
+                write_mesh<<"R"<<endl ;
+		for (int j=0 ; j<num_line ; j++)
+		  {
+		    read_mesh<<(column_to_send_rigth-start)*num_lines+j<<endl ; 
+		  }
+	    }
+            else if (i==num_procs-1)
+            {
+                int column_to_send_left ;  
+                start = boundary_global_indices[2*(i-1)+1] ; 
+                column_to_send_left = boundary_global_indices[2*(i-1)+2] ;
+		end = boundary_global_indices[2*(i-1)+3] ;
+		proc += to_float(i) ; 
+		ofstream read_mesh(proc.c_str()) ;
+		read_mesh<<"start"<<endl ;
+		read<<start<<endl ;
+		read_mesh<<"end"<<endl ;
+		read<<end<<endl ; 
+		for (int j=start ; j<=end ; j++)
+		  {
+		    for (int k=0 ; k<num_lines ; k++)
+		      {
+			write_mesh<<k*delta_y<<" "<<j*delta_x<<endk ; 
+		      }
+		  }
+		write_mesh<<"************************************************"<<endl ;
+		write_mesh<<"L"<<endl ; 
+		for (int j=0 ; j<num_lines ; j++)
+		  {
+		    read_mesh <<(column_to_send_left-start)*num_lines+j<<endl ; 
+		  }	
+            }
+	    else
+	    {
+	      int column_to_send_left ;
+	      int column_to_send_right ;
+	      start = boundary_global_indices[2*(i-1)+1] ;
+	      column_to_send_left = boundary_global_indices[2*(i-1)+2] ;
+	      column_ti_send_right = boundary_global_indices[2*(i-1)+3] ;
+	      end = boundary_global_indices[2*(i-1)+3] ;
+	      proc+= to_string(i) ;
+	      ofsream read_mesh(proc.c_str()) ;
+	      read_mesh<<"start"<<endl ; 
+	      read_mesh<<start<<endl ;
+	      read_mesh<<"end"<<endl ;
+	      read<<end<<endl ;
+	      for (int j=start ; j<=end ; j++)
+		{
+		  for (k=0 ; k<num_lines ; k++)
+		    {
+		      cout<<k*delta_y<<" "<<j*delta_x<<endl ; 
+		    }
+		}
+	      read_mesh<<"******************************************"<<endl ;
+	      read_mesh<<"L"<<endl ;
+	      for (int j=0 ; j< num_lines ; j++)
+		{
+		  cout<<(column_to_send_left-start)*num_lines+j<<endl ; 
+		}
+	      read_mesh<<"************************************************************"<<endl ;
+	      read_mesh<<"R"<<endl ;
+	      for (int j=0 ; j<num_lines ; j++)
+		{
+		  cout<<(column_to_send_right-start)*num_lines+j<<endl ; 
+		}
+											      
+	    }
+	}
+    }
+
+}
+

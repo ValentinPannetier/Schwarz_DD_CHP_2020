@@ -1,0 +1,14 @@
+#include <string> 
+#include <iostream>
+#include <fstream>  
+                                
+
+
+void charge(int, int, int, int&, int&);
+void partitions(int ,int,int, int* ); 
+void build_meshes(std::string) ;
+void read_mesh(std::string, ibt* ,int*) ;
+
+
+
+
