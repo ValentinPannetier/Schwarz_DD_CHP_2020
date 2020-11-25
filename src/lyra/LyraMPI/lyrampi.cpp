@@ -1,6 +1,6 @@
 #include "lyrampi.hpp"
 
-Proc * LYRA_PROC = new Proc ();
+Proc * LYRA_PROC = nullptr;
 
 std::ostream &
 operator<< (std::ostream & flux, const Proc & proc)
@@ -13,6 +13,8 @@ operator<< (std::ostream & flux, const Proc & proc)
 void
 LyraInit (int * argc, char *** argv)
 {
+    Proc * LYRA_PROC = new Proc ();
+
     MPI_Init (argc, argv);
 
     MPI_Comm_size (MPI_COMM_WORLD, &LYRA_PROC->nproc);

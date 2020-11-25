@@ -8,7 +8,7 @@
 #include "../lyra_common.hpp"
 
 #define LYRA_PROC ProcMe
-#define LYRA_ASK  (LYRA_PROC->rank == 0)
+#define LYRA_ASK  ((LYRA_PROC == nullptr) || (LYRA_PROC->rank == 0))
 
 struct Proc
 {

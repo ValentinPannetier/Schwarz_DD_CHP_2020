@@ -15,20 +15,20 @@ static error_t error;
 int
 main (int argc, char ** argv)
 {
-    LyraInit (&argc, &argv);
+    // LyraInit (&argc, &argv);
 
     if (LYRA_ASK)
     {
         std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
-        std::cout << COLOR_BLUE << REVERSE << "Welcome in Lyra !" << COLOR_DEFAULT << " You are running on " << LYRA_PROC->nproc << " procs." << ENDLINE;
+        std::cout << COLOR_BLUE << REVERSE << "\tWelcome in Lyra !" << COLOR_DEFAULT << " You are running on " << (LYRA_PROC ? LYRA_PROC->nproc : 0) << " procs." << ENDLINE;
         std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
     }
 
     // Example of mesh generation
-    if (false)
+    if (true)
     {
         int nx = 70;
-        int ny = 70;
+        int ny = 30;
 
         real_t dx = 1.0 / (nx - 1);
         real_t dy = 1.0 / (ny - 1);
@@ -37,18 +37,18 @@ main (int argc, char ** argv)
 
         // file << std::scientific;
         file << nx * ny << std::endl;
-        for (int i = 0; i < nx; ++i)
-            for (int j = 0; j < ny; ++j)
-                file << SPC i * dx << SPC j * dy << SPC 0.0 << SPC i * nx + j << SPC 1 << SPC 0 << std::endl;
+        for (int j = 0; j < ny; ++j)
+            for (int i = 0; i < nx; ++i)
+                file << SPC i * dx << SPC j * dy << SPC 0.0 << SPC j * nx + i << SPC 1 << SPC 0 << std::endl;
 
         file << std::endl;
 
         file << (nx - 1) * (ny - 1) << std::endl;
 
-        for (int i = 0; i < nx - 1; ++i)
-            for (int j = 0; j < ny - 1; ++j)
+        for (int j = 0; j < ny - 1; ++j)
+            for (int i = 0; i < nx - 1; ++i)
             {
-                ul_t id = i * nx + j;
+                ul_t id = j * nx + i;
 
                 file << SPC id << SPC id + 1 << SPC id + nx + 1 << SPC id + nx << std::endl;
             }
@@ -58,28 +58,33 @@ main (int argc, char ** argv)
     }
 
     // TEST
-    // if (false)
-    // {
-    //     real_t a = 2;
-    //     a++;
-    //     ERROR << a << ENDLINE;
+    if (true)
+    {
+        SparseMatrix<real_t> matrix;
+        matrix.Init (3);
 
-    //     SparseMatrix<real_t> matrix;
-    //     (void)matrix;
+        std::vector<Triplet<real_t> > listOfTriplets;
 
-    //     Mesh<real_t> mesh(2, 2);
-    //     ul_t b = mesh.GetGlobalId(1, 2);
-    //     (void)b;
+        listOfTriplets.push_back (Triplet<real_t> (0, 2, 5.0));
+        listOfTriplets.push_back (Triplet<real_t> (0, 0, 1.0));
+        listOfTriplets.push_back (Triplet<real_t> (1, 1, 1e-25));
+        listOfTriplets.push_back (Triplet<real_t> (2, 2, 1.0));
 
-    //     ul_t i, j;
-    //     for (ul_t id : {0, 1, 2, 3, 4, 5})
-    //     {
-    //         std::tie(i, j) = mesh.GetGridId(id);
-    //         std::cout << id << " i:" << i << " j:" << j << std::endl;
-    //     }
+        matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
 
-    //     std::cout << "mesh is " << mesh << std::endl;
-    // }
+        // matrix.PrintSparseView ();
+        matrix.PrintDenseView ();
+        matrix.Pruned ();
+        matrix.PrintDenseView ();
+
+        std::vector<real_t> vec = {1, 1, 1};
+
+        auto out = matrix * vec;
+
+        for (real_t value : out)
+            std::cout << value << " ";
+        std::cout << std::endl;
+    }
 
     if (argc < 2)
     {
@@ -98,6 +103,6 @@ main (int argc, char ** argv)
     error = Write (&mesh, "test.mesh");
     USE_ERROR (error);
 
-    LyraFinalize ();
+    // LyraFinalize ();
     return EXIT_SUCCESS;
 }
