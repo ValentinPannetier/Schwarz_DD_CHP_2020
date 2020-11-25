@@ -114,29 +114,29 @@
                     if (j==start) //bord gauche physique
                     {
                       for (int k=0 ; k<num_lines; k++) 
-                        {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<5<<" "<<0<<endl ;}     
+                        {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<5<<" "<<0<<endl ;}     
                     }
                     else if (j==end) //bord de droite fictif
                     {
                       for (int k=0 ; k<num_lines;k++) 
-                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
-                          else if (k==num_lines-1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
-                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}} 
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==num_lines-1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<0<<endl ;}} 
                     }
                     else if (j==column_to_send_right) 
                     {
                       for (int k=0 ; k<num_lines;k++) 
-                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
-                          else if (k==num_lines-1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
-                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<1<<" "<<i+1<<endl ;}}  
+                        {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
+                          else if (k==num_lines-1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<1<<" "<<i+1<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<1<<" "<<i+1<<endl ;}}  
                     }
                     else 
                     {
                         for (int k=0 ; k<num_lines;k++)
                         {
-                          {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}//bord haut
-                          else if (k==num_lines-1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<-1<<" "<<0<<endl ;}//bord haut
-                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<4<<" "<<0<<endl ;}} 
+                          {if (k==0){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<0<<endl ;}//bord haut
+                          else if (k==num_lines-1){write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<-1<<" "<<0<<endl ;}//bord haut
+                          else {write_mesh<<k*delta_y<<" "<<j*delta_x<<" "<<k+j*num_lines<<4<<" "<<0<<endl ;}} 
                         }
                     }
                    }
