@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 #include "Data/mesh.hpp"
 #include "IO/io.hpp"
@@ -16,8 +17,15 @@ main (int argc, char ** argv)
 {
     LyraInit (&argc, &argv);
 
+    if (LYRA_ASK)
+    {
+        std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
+        std::cout << COLOR_BLUE << REVERSE << "Welcome in Lyra !" << COLOR_DEFAULT << " You are running on " << LYRA_PROC->nproc << " procs." << ENDLINE;
+        std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
+    }
+
     // Example of mesh generation
-    if (true)
+    if (false)
     {
         int nx = 70;
         int ny = 70;
@@ -85,7 +93,7 @@ main (int argc, char ** argv)
     error = Read (filename, &mesh);
     USE_ERROR (error);
 
-    std::cout << "mesh " << mesh << std::endl;
+    STATUS << "Mesh " << mesh << std::endl;
 
     error = Write (&mesh, "test.mesh");
     USE_ERROR (error);

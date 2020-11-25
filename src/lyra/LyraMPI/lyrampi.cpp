@@ -1,8 +1,8 @@
 #include "lyrampi.hpp"
 
-Proc * ProcMe = new Proc ();
+Proc * LYRA_PROC = new Proc ();
 
-std::ostream&
+std::ostream &
 operator<< (std::ostream & flux, const Proc & proc)
 {
     flux << "Proc : " << proc.rank << "/" << proc.nproc << std::flush;
@@ -15,11 +15,8 @@ LyraInit (int * argc, char *** argv)
 {
     MPI_Init (argc, argv);
 
-    MPI_Comm_size (MPI_COMM_WORLD, &ProcMe->nproc);
-    MPI_Comm_rank (MPI_COMM_WORLD, &ProcMe->rank);
-
-    INFOS << *ProcMe << std::endl;
-
+    MPI_Comm_size (MPI_COMM_WORLD, &LYRA_PROC->nproc);
+    MPI_Comm_rank (MPI_COMM_WORLD, &LYRA_PROC->rank);
 
     return;
 }
@@ -27,7 +24,7 @@ LyraInit (int * argc, char *** argv)
 void
 LyraFinalize ()
 {
-    delete ProcMe;
+    delete LYRA_PROC;
     MPI_Finalize ();
 
     return;

@@ -81,7 +81,7 @@ public:
 
     LYRA_INLINE
     Point<T> *
-    GetPoint (ul_t id)
+    GetPoint (ul_t & id)
     {
         return m_points [id];
     }

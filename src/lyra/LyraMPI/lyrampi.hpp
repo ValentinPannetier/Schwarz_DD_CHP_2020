@@ -7,13 +7,16 @@
 
 #include "../lyra_common.hpp"
 
+#define LYRA_PROC ProcMe
+#define LYRA_ASK  (LYRA_PROC->rank == 0)
+
 struct Proc
 {
     int rank  = 0;
     int nproc = 0;
 };
 
-extern Proc * ProcMe;
+extern Proc * LYRA_PROC;
 
 std::ostream &
 operator<< (std::ostream & flux, const Proc & proc);

@@ -28,7 +28,8 @@ typedef int           error_t;
 #define ENDFUN           std::cout << ENDLINE
 #define COUT             std::cout
 
-#define SPC std::setw (14) <<
+#define SPC  std::setw (15) <<
+#define NEXT " " <<
 
 #define USE_ERROR(X)       \
     if (X == EXIT_FAILURE) \

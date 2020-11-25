@@ -80,12 +80,15 @@ Read (std::string filename, Mesh<real_t> * mesh)
 error_t
 Write (Mesh<real_t> * mesh, std::string filename)
 {
+    // MEDIT FILE
+    // ne pas mettre les uppercase ni la notation scientifique, il ne les lit pas
     std::ofstream file (filename);
 
+    // file.flags (std::ios::uppercase);
     // file << std::scientific;
 
-    file << "MeshVersionFormatted 1\n";
-    file << "\nDimension 2\n";
+    file << "MeshVersionFormatted " << 1 << "\n";
+    file << "\nDimension " << 2 << "\n";
 
     ul_t numPoints = mesh->GetNumberOfPoints ();
     file << "\nVertices\n"
