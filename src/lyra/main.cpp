@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -8,6 +9,9 @@
 #include "IO/io.hpp"
 #include "LyraMPI/lyrampi.hpp"
 #include "SparseMatrix/sparsematrix.hpp"
+// #include "Sparsesolver/bicgstb.hpp"
+// #include "Sparsesolver/cg.hpp"
+#include "Sparsesolver/sparsesolver.hpp"
 #include "Tools/tools.hpp"
 #include "lyra_common.hpp"
 
@@ -84,6 +88,112 @@ main (int argc, char ** argv)
         auto out = matrix * vec;
 
         std::cout << out << std::endl;
+        auto b = 3.0 * out;
+        std::cout << b << std::endl;
+    }
+
+    // Test Solver
+    if (true)
+    {
+        SparseMatrix<real_t> matrix;
+        matrix.Init (3);
+
+        std::vector<Triplet<real_t> > listOfTriplets;
+
+        listOfTriplets.push_back (Triplet<real_t> (0, 0, 1.0));
+        // listOfTriplets.push_back (Triplet<real_t> (0, 2, 1.0));
+        listOfTriplets.push_back (Triplet<real_t> (1, 1, 2.0));
+        listOfTriplets.push_back (Triplet<real_t> (2, 2, 3.0));
+        listOfTriplets.push_back (Triplet<real_t> (2, 0, 1.0));
+
+        matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
+        matrix.PrintDenseView (std::cout << "A = \n");
+
+        SparseCG<real_t> solver (matrix);
+        // SparseBiCGSTAB<real_t> solver (matrix);
+
+        std::vector<real_t> b = {1, 1, 1};
+
+        std::vector<real_t> x      = solver.Solve (b);
+        std::vector<real_t> btilde = matrix * x;
+
+        std::cout << "b       : " << b << std::endl;
+        std::cout << "sol     : " << x << std::endl;
+        std::cout << "btilde  : " << btilde << std::endl;
+    }
+
+    // Test Solver
+    if (true)
+    {
+        srand (time (nullptr));
+
+        ul_t Nx = 30;
+        ul_t Ny = 30;
+
+        std::cout << "\n----------------------------------" << std::endl;
+        std::cout << "Random test solver Nx : " << Nx << " Ny : " << Ny << std::endl;
+
+        SparseMatrix<real_t> matrix;
+        matrix.Init (Nx * Ny);
+
+        std::vector<Triplet<real_t> > listOfTriplets;
+        std::vector<real_t>           b;
+
+        listOfTriplets.reserve (5 * Nx * Ny);
+        b.resize (Nx * Ny, 0.0);
+
+        for (ul_t i = 0; i < (Nx * Ny); ++i)
+        {
+            // ul_t randN = std::rand () % N / 10;
+
+            if (i - Ny > 0)
+                listOfTriplets.push_back (Triplet<real_t> (i, i - Ny, 1));
+
+            if (i + Ny < (Nx * Ny))
+                listOfTriplets.push_back (Triplet<real_t> (i, i + Ny, 1));
+
+            if (i - 1 > 0)
+                listOfTriplets.push_back (Triplet<real_t> (i, i - 1, 1));
+
+            if (i + 1 < (Nx * Ny))
+                listOfTriplets.push_back (Triplet<real_t> (i, i + 1, 1));
+
+            listOfTriplets.push_back (Triplet<real_t> (i, i, -2));
+
+            // for (ul_t j : std::vector<ul_t> ({i - Ny, i - 1, i, i + 1, i + Ny}))
+            // {
+            //     real_t value = static_cast<real_t> (std::rand () % 100) / 10.0;
+
+            //     listOfTriplets.push_back (Triplet<real_t> (i, j, value));
+            //     listOfTriplets.push_back (Triplet<real_t> (j, i, value));  // symetric
+            // }
+
+            real_t value = static_cast<real_t> (std::rand () % 100) / 10.0;
+
+            b [i] = value;
+        }
+
+        std::cout << "Fill triplets " << std::endl;
+
+        matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
+        std::cout << "Fill matrix " << std::endl;
+
+        matrix.PrintSparseView (std::cout << "A = \n");
+        // std::cout << "b       : " << b << std::endl;
+
+        SparseCG<real_t> solver (matrix);
+        // SparseBiCGSTAB<real_t> solver (matrix);
+
+        std::vector<real_t> x      = solver.Solve (b);
+        std::vector<real_t> btilde = matrix * x;
+
+        for (ul_t i = 0; i < (Nx * Ny); ++i)
+            btilde [i] -= b [i];
+
+        // std::cout << "b       : " << b << std::endl;
+        // std::cout << "sol     : " << x << std::endl;
+        // using Type = std::vector<real_t>;
+        std::cout << "|| Ax - b ||_l2  : " << std::sqrt (DOT (btilde, btilde)) << std::endl;
     }
 
     if (argc < 2)

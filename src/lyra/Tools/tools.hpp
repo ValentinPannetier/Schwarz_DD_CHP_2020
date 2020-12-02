@@ -25,4 +25,50 @@ operator<< (std::ostream & stream, const std::vector<T> & vec)
         stream << value << " " << std::flush;
     return stream;
 }
+
+template <typename T>
+T
+operator| (const std::vector<T> & a, const std::vector<T> & b)
+{
+    if (a.size () != b.size ())
+        return T ();
+
+    T    result = T ();
+    ul_t sz     = a.size ();
+
+    for (ul_t i = 0; i < sz; ++i)
+        result += a [i] * b [i];
+
+    return result;
+}
+
+template <typename T>
+std::vector<T>
+operator* (const T & value, const std::vector<T> & vec)
+{
+    // ul_t           sz     = vec.size ();
+    std::vector<T> result = vec;
+
+    for (T & v : result)
+        v *= value;
+
+    return result;
+}
+
+template <typename T>
+std::vector<T>
+operator+ (const std::vector<T> & a, const std::vector<T> & b)
+{
+    if (a.size () != b.size ())
+        return std::vector<T> ();
+
+    ul_t           sz     = a.size ();
+    std::vector<T> result = a;
+
+    for (ul_t i = 0; i < sz; ++i)
+        result [i] += b [i];
+
+    return result;
+}
+
 #endif  // TOOLS_HPP

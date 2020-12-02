@@ -45,4 +45,11 @@ typedef enum
     C_DEFAULT = C_EMPTY
 } CTYPE;
 
+typedef enum
+{
+    SOLVER_NONE,
+    SOLVER_CG,
+    SOLVER_BICGSTAB
+} STYPE;
+
 #endif  // ENUMLIST_HPP

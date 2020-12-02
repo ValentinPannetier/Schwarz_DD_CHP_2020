@@ -85,6 +85,13 @@ public:
         return out;
     }
 
+    LYRA_HARD_INLINE
+    ul_t
+    Size () const
+    {
+        return m_np;
+    }
+
     void
     PrintSparseView (std::ostream & stream = std::cout)
     {
@@ -164,6 +171,17 @@ public:
         }
 
         return out;
+    }
+
+    T
+    RowProduct (const std::vector<T> & vec, ul_t rowid) const
+    {
+        RowCompactor * row  = m_rows [rowid];
+        T              data = 0;
+        for (ul_t id = 0; id < row->colid.size (); ++id)
+            data += row->value [id] * vec [row->colid [id]];
+
+        return data;
     }
 
     /**
