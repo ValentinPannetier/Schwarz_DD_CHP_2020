@@ -1,9 +1,9 @@
 nx
-10
+11
 ny
-10
+11
 num_procs
-3
+4
 recovery
 2
 cut_plan

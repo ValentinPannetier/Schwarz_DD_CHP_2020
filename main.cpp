@@ -1,13 +1,14 @@
-//#include "partitions.h"
-/*
+#include "partitions.h"
+
 int main()
 {
-    /*std::string str ; 
+    std::string str ; 
     str = std::to_string(1.0) ; 
     std::cout<<str<<std::endl ;
     
     build_meshes("input.txt") ;
-    int* nx_local ; 
+    
+    /*int* nx_local ; 
     int* indices_to_send_right=new int[10] ; 
     int* indices_to_send_left=new int[10] ;
     read_mesh(3,0,nx_local,indices_to_send_right,indices_to_send_left) ;
@@ -35,12 +36,13 @@ int main()
     {
         std::cout<<indices_to_send_left[i]<<std::endl ;
     }
-
+*/
 }
-*/ 
+
+/*
 #include "Sparse.h"
 int main() 
-{/*
+{
     Triplets Triplet(10,10) ; 
     Triplet.add(1,1,0.5) ;
     Triplet.add(3,1,0.75) ;
@@ -59,8 +61,7 @@ int main()
     //Triplet.ranging() ;
     //Triplet.show() ;
     
-    Triplet.settriplet() ;
-*/ 
+    Triplet.settriplet() ; 
     SparseMatrix Spm(4,4) ;
     
     Spm.add_value(0,0,2) ;
@@ -88,5 +89,6 @@ int main()
     {
         std::cout<<result[i]<<std::endl ; 
     } 
-*/    
+    
 }
+*/
