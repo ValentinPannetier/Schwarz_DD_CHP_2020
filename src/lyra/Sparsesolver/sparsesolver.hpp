@@ -62,7 +62,7 @@ public:
     {
         using Type = std::vector<T>;
 
-        T eps = 1e-20;
+        T eps = 1e-10;
 
         ul_t size = SuperClass::m_matrix.Size ();
 

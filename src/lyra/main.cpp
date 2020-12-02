@@ -1,6 +1,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -9,13 +10,28 @@
 #include "IO/io.hpp"
 #include "LyraMPI/lyrampi.hpp"
 #include "SparseMatrix/sparsematrix.hpp"
-// #include "Sparsesolver/bicgstb.hpp"
-// #include "Sparsesolver/cg.hpp"
 #include "Sparsesolver/sparsesolver.hpp"
 #include "Tools/tools.hpp"
 #include "lyra_common.hpp"
 
 static error_t error;
+
+real_t dt = 1.0;
+real_t dx = 1.0;
+real_t dy = 1.0;
+real_t D  = 1.0;
+
+std::function<real_t (Point<real_t> *, real_t)> f = [] (Point<real_t> * p, real_t t) -> real_t {
+    return p->x + p->y + p->z + t;
+};
+
+std::function<real_t (Point<real_t> *, real_t)> g = [] (Point<real_t> * p, real_t t) -> real_t {
+    return p->x + p->y + p->z + t;
+};
+
+std::function<real_t (Point<real_t> *, real_t)> h = [] (Point<real_t> * p, real_t t) -> real_t {
+    return p->x + p->y + p->z + t;
+};
 
 int
 main (int argc, char ** argv)
@@ -29,176 +45,9 @@ main (int argc, char ** argv)
         std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
     }
 
-    // Example of mesh generation
-    if (true)
-    {
-        int nx = 70;
-        int ny = 30;
-
-        real_t dx = 1.0 / (nx - 1);
-        real_t dy = 1.0 / (ny - 1);
-
-        std::ofstream file ("../test.lyra");
-
-        // file << std::scientific;
-        file << nx * ny << std::endl;
-        for (int j = 0; j < ny; ++j)
-            for (int i = 0; i < nx; ++i)
-                file << SPC i * dx << SPC j * dy << SPC 0.0 << SPC j * nx + i << SPC 1 << SPC 0 << std::endl;
-
-        file << std::endl;
-
-        file << (nx - 1) * (ny - 1) << std::endl;
-
-        for (int j = 0; j < ny - 1; ++j)
-            for (int i = 0; i < nx - 1; ++i)
-            {
-                ul_t id = j * nx + i;
-
-                file << SPC id << SPC id + 1 << SPC id + nx + 1 << SPC id + nx << std::endl;
-            }
-
-        file.close ();
-        // exit (EXIT_SUCCESS);
-    }
-
-    // TEST
-    if (true)
-    {
-        SparseMatrix<real_t> matrix;
-        matrix.Init (3);
-
-        std::vector<Triplet<real_t> > listOfTriplets;
-
-        listOfTriplets.push_back (Triplet<real_t> (0, 2, 5.0));
-        listOfTriplets.push_back (Triplet<real_t> (0, 0, 1.0));
-        listOfTriplets.push_back (Triplet<real_t> (1, 1, 1e-25));
-        listOfTriplets.push_back (Triplet<real_t> (2, 2, 1.0));
-
-        matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
-
-        // matrix.PrintSparseView ();
-        matrix.PrintDenseView ();
-        matrix.Pruned ();
-        matrix.PrintDenseView ();
-
-        std::vector<real_t> vec = {1, 1, 1};
-        std::cout << "Multiplié par : " << vec << std::endl;
-
-        auto out = matrix * vec;
-
-        std::cout << out << std::endl;
-        auto b = 3.0 * out;
-        std::cout << b << std::endl;
-    }
-
-    // Test Solver
-    if (true)
-    {
-        SparseMatrix<real_t> matrix;
-        matrix.Init (3);
-
-        std::vector<Triplet<real_t> > listOfTriplets;
-
-        listOfTriplets.push_back (Triplet<real_t> (0, 0, 1.0));
-        // listOfTriplets.push_back (Triplet<real_t> (0, 2, 1.0));
-        listOfTriplets.push_back (Triplet<real_t> (1, 1, 2.0));
-        listOfTriplets.push_back (Triplet<real_t> (2, 2, 3.0));
-        listOfTriplets.push_back (Triplet<real_t> (2, 0, 1.0));
-
-        matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
-        matrix.PrintDenseView (std::cout << "A = \n");
-
-        SparseCG<real_t> solver (matrix);
-        // SparseBiCGSTAB<real_t> solver (matrix);
-
-        std::vector<real_t> b = {1, 1, 1};
-
-        std::vector<real_t> x      = solver.Solve (b);
-        std::vector<real_t> btilde = matrix * x;
-
-        std::cout << "b       : " << b << std::endl;
-        std::cout << "sol     : " << x << std::endl;
-        std::cout << "btilde  : " << btilde << std::endl;
-    }
-
-    // Test Solver
-    if (true)
-    {
-        srand (time (nullptr));
-
-        ul_t Nx = 30;
-        ul_t Ny = 30;
-
-        std::cout << "\n----------------------------------" << std::endl;
-        std::cout << "Random test solver Nx : " << Nx << " Ny : " << Ny << std::endl;
-
-        SparseMatrix<real_t> matrix;
-        matrix.Init (Nx * Ny);
-
-        std::vector<Triplet<real_t> > listOfTriplets;
-        std::vector<real_t>           b;
-
-        listOfTriplets.reserve (5 * Nx * Ny);
-        b.resize (Nx * Ny, 0.0);
-
-        for (ul_t i = 0; i < (Nx * Ny); ++i)
-        {
-            // ul_t randN = std::rand () % N / 10;
-
-            if (i - Ny > 0)
-                listOfTriplets.push_back (Triplet<real_t> (i, i - Ny, 1));
-
-            if (i + Ny < (Nx * Ny))
-                listOfTriplets.push_back (Triplet<real_t> (i, i + Ny, 1));
-
-            if (i - 1 > 0)
-                listOfTriplets.push_back (Triplet<real_t> (i, i - 1, 1));
-
-            if (i + 1 < (Nx * Ny))
-                listOfTriplets.push_back (Triplet<real_t> (i, i + 1, 1));
-
-            listOfTriplets.push_back (Triplet<real_t> (i, i, -2));
-
-            // for (ul_t j : std::vector<ul_t> ({i - Ny, i - 1, i, i + 1, i + Ny}))
-            // {
-            //     real_t value = static_cast<real_t> (std::rand () % 100) / 10.0;
-
-            //     listOfTriplets.push_back (Triplet<real_t> (i, j, value));
-            //     listOfTriplets.push_back (Triplet<real_t> (j, i, value));  // symetric
-            // }
-
-            real_t value = static_cast<real_t> (std::rand () % 100) / 10.0;
-
-            b [i] = value;
-        }
-
-        std::cout << "Fill triplets " << std::endl;
-
-        matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
-        std::cout << "Fill matrix " << std::endl;
-
-        matrix.PrintSparseView (std::cout << "A = \n");
-        // std::cout << "b       : " << b << std::endl;
-
-        SparseCG<real_t> solver (matrix);
-        // SparseBiCGSTAB<real_t> solver (matrix);
-
-        std::vector<real_t> x      = solver.Solve (b);
-        std::vector<real_t> btilde = matrix * x;
-
-        for (ul_t i = 0; i < (Nx * Ny); ++i)
-            btilde [i] -= b [i];
-
-        // std::cout << "b       : " << b << std::endl;
-        // std::cout << "sol     : " << x << std::endl;
-        // using Type = std::vector<real_t>;
-        std::cout << "|| Ax - b ||_l2  : " << std::sqrt (DOT (btilde, btilde)) << std::endl;
-    }
-
     if (argc < 2)
     {
-        ERROR << "use " << argv [0] << " filename.lyra" << std::endl;
+        ERROR << "use " << argv [0] << " filename.lyra" << ENDLINE;
         return EXIT_FAILURE;
     }
 
@@ -208,7 +57,49 @@ main (int argc, char ** argv)
     error = Read (filename, &mesh);
     USE_ERROR (error);
 
-    STATUS << "Mesh " << mesh << std::endl;
+    STATUS << "read mesh " << mesh << ENDLINE;
+
+    // Generate the matrix of the problem d_t u - D * Laplacian(u) = f on this proc
+
+    // d_t u ~ (u_i^n+1 - u_i^n) / dt                   --> order 1
+    // d_x^2 u ~ (u_{i-1} - 2 u_i + u_{i+1}) / dx^2     --> order 2
+    // d_y^2 u ~ (u_{j-1} - 2 u_j + u_{j+1}) / dy^2     --> order 2
+
+    real_t c_diag     = 1.0 / dt - D * (-2.0 / (dx * dx) - 2.0 / (dy * dy));
+    real_t c_surdiagx = -D * (1.0 / (dx * dx));
+    real_t c_surdiagy = -D * (1.0 / (dy * dy));
+
+    SparseMatrix<real_t> matrix;
+    std::vector<real_t>  second_member;
+
+    matrix.Init (mesh.GetNumberOfPoints ());
+    typename SparseMatrix<real_t>::TripletsList listOfTriplets;
+
+    ul_t numOfPoints = mesh.GetNumberOfPoints ();
+    second_member.resize (numOfPoints, 0.0);
+
+    for (ul_t id = 0; id < numOfPoints; ++id)
+    {
+        Point<real_t> * p = mesh.GetPoint (id);
+
+        listOfTriplets.push_back (Triplet<real_t> (id, id, c_diag));
+
+        for (DIR dir : std::vector<DIR> ({D_UP, D_BOTTOM}))
+            if (p->neigh [dir])
+                listOfTriplets.push_back (Triplet<real_t> (id, p->neigh [dir]->localId, c_surdiagy));
+
+        for (DIR dir : std::vector<DIR> ({D_LEFT, D_RIGHT}))
+            if (p->neigh [dir])
+                listOfTriplets.push_back (Triplet<real_t> (id, p->neigh [dir]->localId, c_surdiagx));
+
+        second_member [id] = f (p, 0.0);
+    }
+
+    matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
+
+    STATUS << "fill matrix with NNZ = " << matrix.NonZeros () << ENDLINE;
+
+    // Make Dirichlet condition ?
 
     error = Write (&mesh, "test.mesh");
     USE_ERROR (error);

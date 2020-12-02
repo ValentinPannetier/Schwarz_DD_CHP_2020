@@ -111,7 +111,7 @@ template <typename T>
 std::ostream &
 operator<< (std::ostream & flux, const Mesh<T> & mesh)
 {
-    flux << "[" << mesh.m_points.size () << " npts, " << mesh.m_numCells << " ncells]" << std::endl;
+    flux << "[" << mesh.m_points.size () << " npts, " << mesh.m_numCells << " ncells]" << std::flush;
 
     return flux;
 }

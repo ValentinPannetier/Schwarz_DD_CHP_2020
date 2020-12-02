@@ -178,7 +178,10 @@ public:
     {
         RowCompactor * row  = m_rows [rowid];
         T              data = 0;
-        for (ul_t id = 0; id < row->colid.size (); ++id)
+        ul_t           size = row->colid.size ();
+
+        // #pragma code_align 32
+        for (ul_t id = 0; id < size; ++id)
             data += row->value [id] * vec [row->colid [id]];
 
         return data;

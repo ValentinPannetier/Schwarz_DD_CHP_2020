@@ -7,14 +7,14 @@
 template <typename T>
 struct Point
 {
-    T          x         = 0.0;
-    T          y         = 0.0;
-    T          z         = 0.0;
-    ul_t       globalId  = 0;  // global id
-    ul_t       localId   = 0;  // local id
-    PTAG       tag       = PTAG::PT_DEFAULT;
-    ul_t       procId    = 0;  // proc id
-    Point<T> * neigh [4] = {nullptr, nullptr, nullptr, nullptr};
+    T                 x         = 0.0;
+    T                 y         = 0.0;
+    T                 z         = 0.0;
+    ul_t              globalId  = 0;  // global id
+    ul_t              localId   = 0;  // local id
+    PTAG              tag       = PTAG::PT_DEFAULT;
+    Point<T> *        neigh [4] = {nullptr, nullptr, nullptr, nullptr};
+    std::vector<ul_t> procsidx  = {};
 
     LYRA_INLINE
     Point<T> *

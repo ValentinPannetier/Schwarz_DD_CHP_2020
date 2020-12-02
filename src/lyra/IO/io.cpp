@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 
+#include "../LyraMPI/lyrampi.hpp"
 #include "../lyra_common.hpp"
 
 error_t
@@ -23,19 +24,20 @@ Read (std::string filename, Mesh<real_t> * mesh)
 
     mesh->InitAndReserve (numPoints);
 
-    ul_t numTags = 0;
-    ul_t tag     = 0;
+    ul_t numProcs = 0;
+    ul_t tag      = 0;
     for (ul_t id = 0; id < numPoints; ++id)
     {
         Point<real_t> * p = new Point<real_t>;
 
-        file >> p->x >> p->y >> p->z >> p->globalId >> numTags;
+        file >> p->x >> p->y >> p->z >> p->globalId >> tag >> numProcs;
 
-        if (numTags == 1)
-        {
-            file >> tag;
-            p->tag = static_cast<PTAG> (tag);
-        }
+        p->tag = static_cast<PTAG> (tag);
+
+        p->procsidx.resize (numProcs, 0);
+        for (ul_t idprocshared = 0; idprocshared < numProcs; ++idprocshared)
+            file >> p->procsidx [idprocshared];
+
         *mesh += p;
     }
 

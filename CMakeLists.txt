@@ -6,7 +6,7 @@ include(FindPkgConfig)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -O3 -g -std=c++11 -Wno-cast-function-type" )
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -O3 -g -std=c++11 -Wno-cast-function-type -Wno-unknown-pragmas" )
 
 # message(STATUS "COMPILE OPTIONS : ${CMAKE_CXX_FLAGS}")
 
