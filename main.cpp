@@ -1,13 +1,14 @@
 #include "partitions.h"
 
-int main()
+int
+main ()
 {
-    std::string str ; 
-    str = std::to_string(1.0) ; 
-    std::cout<<str<<std::endl ;
-    
-    build_meshes("input.txt") ;
-    
+    std::string str;
+    str = std::to_string (1.0);
+    std::cout << str << std::endl;
+
+    build_meshes ("input.txt");
+
     /*int* nx_local ; 
     int* indices_to_send_right=new int[10] ; 
     int* indices_to_send_left=new int[10] ;
