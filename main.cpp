@@ -1,7 +1,7 @@
 #include "partitions.h"
 
 
-int main ()
+int main()
 {
     build_meshes ("input.txt");
 }
