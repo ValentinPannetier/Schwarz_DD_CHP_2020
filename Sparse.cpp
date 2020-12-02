@@ -1,148 +1,147 @@
-#include "Sparse.h" 
+#include "Sparse.h"
 
-using namespace std ; 
+using namespace std;
 
-Triplets::Triplets(int num_rows, int num_cols)
+Triplets::Triplets (int num_rows, int num_cols)
 {
-    m_num_rows = num_rows ; 
-    m_num_cols = num_cols ; 
-    m_triplets_size = 0 ;
-    m_entry_data = (float*) calloc(m_num_rows*m_num_cols,sizeof(float)) ;
-    m_IA = (int*) calloc((m_num_rows+1),sizeof(int)) ; 
+    m_num_rows      = num_rows;
+    m_num_cols      = num_cols;
+    m_triplets_size = 0;
+    m_entry_data    = (float *)calloc (m_num_rows * m_num_cols, sizeof (float));
+    m_IA            = (int *)calloc ((m_num_rows + 1), sizeof (int));
 }
 
-void Triplets::add(int i , int j , float values) 
+void
+Triplets::add (int i, int j, float values)
 {
-    m_triplets_size++ ; 
-    //realloc(m_entry_data , sizeof(m_entry_data)+3*sizeof(float)) ; 
-    m_entry_data[3*(m_triplets_size-1)] = (float) i ;
-    m_entry_data[3*(m_triplets_size-1)+1] = (float) j ;
-    m_entry_data[3*(m_triplets_size-1)+2] = values ;  
-    
-    
+    m_triplets_size++;
+    //realloc(m_entry_data , sizeof(m_entry_data)+3*sizeof(float)) ;
+    m_entry_data [3 * (m_triplets_size - 1)]     = (float)i;
+    m_entry_data [3 * (m_triplets_size - 1) + 1] = (float)j;
+    m_entry_data [3 * (m_triplets_size - 1) + 2] = values;
 }
 
-void Triplets::show() 
+void
+Triplets::show ()
 {
-    for (int k=0 ; k<m_triplets_size ; k++)
+    for (int k = 0; k < m_triplets_size; k++)
     {
-        cout<<m_entry_data[3*k]<<" "<<m_entry_data[3*k+1]<<" "<<m_entry_data[3*k+2]<<endl; 
+        cout << m_entry_data [3 * k] << " " << m_entry_data [3 * k + 1] << " " << m_entry_data [3 * k + 2] << endl;
     }
 }
 
-void Triplets::ranging() 
+void
+Triplets::ranging ()
 {
-    float a1 , a2 , a3 ; 
-    float min ; 
-    int index ;
-    int i ; 
-    i=0 ; 
-   for  (i = 0 ; i<m_triplets_size ; i++) 
+    float a1, a2, a3;
+    float min;
+    int   index;
+    int   i;
+    i = 0;
+    for (i = 0; i < m_triplets_size; i++)
     {
-        min = m_entry_data[3*i] ;
-	    index = i ;
-    
-        for (int j=i+1 ; j<m_triplets_size ; j++)
+        min   = m_entry_data [3 * i];
+        index = i;
+
+        for (int j = i + 1; j < m_triplets_size; j++)
         {
-            if (m_entry_data[3*j]<= min)
+            if (m_entry_data [3 * j] <= min)
             {
-                min = m_entry_data[3*j] ;
-                index =  j ;   
+                min   = m_entry_data [3 * j];
+                index = j;
             }
         }
-        
-       
-        a1 = m_entry_data[3*index] ; 
-        a2 = m_entry_data[3*index+1] ; 
-        a3 = m_entry_data[3*index+2] ; 
-        m_entry_data[3*index] = m_entry_data[3*i] ;
-        m_entry_data[3*index+1] = m_entry_data[3*i+1] ;
-        m_entry_data[3*index+2] = m_entry_data[3*i+2] ; 
-        m_entry_data[3*i] = a1 ; 
-        m_entry_data[3*i+1] = a2 ;
-        m_entry_data[3*i+2] = a3 ;
+
+        a1                           = m_entry_data [3 * index];
+        a2                           = m_entry_data [3 * index + 1];
+        a3                           = m_entry_data [3 * index + 2];
+        m_entry_data [3 * index]     = m_entry_data [3 * i];
+        m_entry_data [3 * index + 1] = m_entry_data [3 * i + 1];
+        m_entry_data [3 * index + 2] = m_entry_data [3 * i + 2];
+        m_entry_data [3 * i]         = a1;
+        m_entry_data [3 * i + 1]     = a2;
+        m_entry_data [3 * i + 2]     = a3;
     }
     /*
     for (int k=0 ; k<m_triplets_size ; k++) 
     {cout<<m_entry_data[3*k]<<" "<<m_entry_data[3*k+1]<<" "<<m_entry_data[3*k+2]<<endl ;}
     */
-    cout<<m_entry_data[3*(m_triplets_size-1)+2]<<endl ;  ;
-    cout<<"****"<<endl ;
-    
+    cout << m_entry_data [3 * (m_triplets_size - 1) + 2] << endl;
+    ;
+    cout << "****" << endl;
 }
 
-void Triplets::settriplet() 
+void
+Triplets::settriplet ()
 {
-    ranging() ;
-    m_values = (float*) calloc(m_triplets_size,sizeof(float)) ;
-    m_IJ = (int*) calloc(m_triplets_size,sizeof(float)) ;
-    m_IA[0] = 0 ; 
+    ranging ();
+    m_values = (float *)calloc (m_triplets_size, sizeof (float));
+    m_IJ     = (int *)calloc (m_triplets_size, sizeof (float));
+    m_IA [0] = 0;
     int num_elements_per_row;
-    int i,j ;
-    int index ;  
-    i=0 ;
-    while (i<m_triplets_size-1)
+    int i, j;
+    int index;
+    i = 0;
+    while (i < m_triplets_size - 1)
     {
-        j=i+1 ; 
-        num_elements_per_row = 1 ; 
-        while (m_entry_data[3*j] == m_entry_data[3*i])
+        j                    = i + 1;
+        num_elements_per_row = 1;
+        while (m_entry_data [3 * j] == m_entry_data [3 * i])
         {
-            num_elements_per_row++ ;
-            j++ ;  
+            num_elements_per_row++;
+            j++;
         }
-        index = (int) m_entry_data[3*i] ;
-        i = j ; 
-        m_IA[index+1] = num_elements_per_row  ; 
-    }  
-    
-    if (m_entry_data[3*(m_triplets_size-2)] != m_entry_data[3*(m_triplets_size-1)]) 
-    {    
-        index = (int) m_entry_data[3*(m_triplets_size-1)] ; 
-        m_IA[index+1] = 1 ;  
+        index            = (int)m_entry_data [3 * i];
+        i                = j;
+        m_IA [index + 1] = num_elements_per_row;
     }
-    for (i=1 ; i<m_num_rows+1 ; i++) 
-    {
-        m_IA[i] = m_IA[i] + m_IA[i-1] ;
-    }
-    
-    for (int i=0 ; i<m_triplets_size ; i++) 
-    {
-        m_values[i] =  m_entry_data[3*i+2] ; 
-        m_IJ[i] = (int) m_entry_data[3*i+1] ; 
 
-    } 
-    cout<<  m_entry_data[3*(m_triplets_size-1)+2]<<endl ;  
-    cout<<"****"<<endl ; 
+    if (m_entry_data [3 * (m_triplets_size - 2)] != m_entry_data [3 * (m_triplets_size - 1)])
+    {
+        index            = (int)m_entry_data [3 * (m_triplets_size - 1)];
+        m_IA [index + 1] = 1;
+    }
+    for (i = 1; i < m_num_rows + 1; i++)
+    {
+        m_IA [i] = m_IA [i] + m_IA [i - 1];
+    }
+
+    for (int i = 0; i < m_triplets_size; i++)
+    {
+        m_values [i] = m_entry_data [3 * i + 2];
+        m_IJ [i]     = (int)m_entry_data [3 * i + 1];
+    }
+    cout << m_entry_data [3 * (m_triplets_size - 1) + 2] << endl;
+    cout << "****" << endl;
     /*
     for (int i=0 ; i<m_triplets_size ; i++) 
     {
         cout<<m_values[i]<<endl ; 
     }
     */
-    
 }
 
-
-SparseMatrix::SparseMatrix(int num_rows , int num_cols)
+SparseMatrix::SparseMatrix (int num_rows, int num_cols)
 {
-  m_num_rows = num_rows ;
-  m_num_cols = num_cols ;
-  Triplet = new Triplets(num_rows , num_cols) ;  
+    m_num_rows = num_rows;
+    m_num_cols = num_cols;
+    Triplet    = new Triplets (num_rows, num_cols);
 }
 
-void SparseMatrix::add_value(int i , int j , float value)
+void
+SparseMatrix::add_value (int i, int j, float value)
 {
-  Triplet->add(i,j,value) ; 
+    Triplet->add (i, j, value);
 }
 
-
-void SparseMatrix::set_matrix()
+void
+SparseMatrix::set_matrix ()
 {
-  Triplet->settriplet() ;
-  m_IA = Triplet->get_m_IA() ;
-  m_IJ = Triplet->get_m_IJ() ;
-  m_values = Triplet->get_m_values() ; 
-  /*
+    Triplet->settriplet ();
+    m_IA     = Triplet->get_m_IA ();
+    m_IJ     = Triplet->get_m_IJ ();
+    m_values = Triplet->get_m_values ();
+    /*
   
   for (int i=0 ; i<5 ; i++) 
   {
@@ -154,31 +153,28 @@ void SparseMatrix::set_matrix()
       cout<<m_IJ[i]<<" "<<m_values[i]<<endl ;
   }
  */
-
-  
 }
 
-
-float* SparseMatrix::vector_mult(float* x)
+float *
+SparseMatrix::vector_mult (float * x)
 {
-  float* result ;
-  result = (float*) calloc(m_num_rows,sizeof(float)) ;
+    float * result;
+    result = (float *)calloc (m_num_rows, sizeof (float));
 
-  int num_element_per_row ; 
-  int index = 0 ; 
-  for (int i=0 ; i<m_num_rows ; i++)
+    int num_element_per_row;
+    int index = 0;
+    for (int i = 0; i < m_num_rows; i++)
     {
-      num_element_per_row = m_IA[i+1] - m_IA[i] ;
-      result[i] = 0 ; 
-      for (int j=0 ; j<num_element_per_row ; j++)
-	{
-	  index = index + j ;
-	  result[i] += m_values[index]*x[m_IJ[index]] ;
-	}
-      index++ ; 
+        num_element_per_row = m_IA [i + 1] - m_IA [i];
+        result [i]          = 0;
+        for (int j = 0; j < num_element_per_row; j++)
+        {
+            index = index + j;
+            result [i] += m_values [index] * x [m_IJ [index]];
+        }
+        index++;
     }
-    return result ; 
-  
+    return result;
 }
 /* 
 float dot_product(int n_size, float* vect1, float* vect2)

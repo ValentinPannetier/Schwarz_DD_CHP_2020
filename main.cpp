@@ -1,9 +1,8 @@
 #include "partitions.h"
 
-int main()
+
+int main ()
 {
-    
-    build_meshes("input.txt") ;
-    return 0 ; 
+    build_meshes ("input.txt");
 }
 
