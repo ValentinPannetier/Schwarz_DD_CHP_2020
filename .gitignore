@@ -27,13 +27,18 @@
 *.lib
 
 # Executables
+*exe
 *.exe
 *.out
+*out
 *.app
+*app
 
 # vscode
 /.vscode
 
+# all temp
+*~
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
