@@ -29,4 +29,4 @@ include_directories(${MPI_INCLUDE_PATH})
 add_subdirectory (${CMAKE_SOURCE_DIR}/src/lyra)
 
 # Add exec partition
-# add_subdirectory (${CMAKE_SOURCE_DIR}/src/?????)
+add_subdirectory (${CMAKE_SOURCE_DIR}/src/partition)
