@@ -25,6 +25,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/libs)
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty)
+
 # Add lyra
 add_subdirectory (${CMAKE_SOURCE_DIR}/src/lyra)
 

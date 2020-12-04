@@ -16,21 +16,25 @@ private:
 public:
     Point (){};
     void set_point (std::vector<double> coords, std::vector<int> procs_2_send, int global_num, int label, int num_tags);
+
     std::vector<double>
     get_coords ()
     {
         return m_coords;
     };
+
     int
     get_label ()
     {
         return m_label;
     };
+
     int
     get_num_tags ()
     {
         return m_num_tags;
     };
+
     std::vector<int>
     get_procs_2_send ()
     {

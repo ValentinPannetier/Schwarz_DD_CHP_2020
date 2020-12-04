@@ -23,16 +23,21 @@ Mesh::read_mesh ()
     read >> m_num_of_elements;
     std::vector<int>    send_2_procs;
     std::vector<double> coords;
+
     coords.resize (3);
+
     int global_num, label, num_tags;
+
     for (int i = 0; i < m_num_of_elements; i++)
     {
         read >> coords [0] >> coords [1] >> coords [2] >> global_num >> label >> num_tags;
+
         if (num_tags == 1)
         {
             send_2_procs.resize (1);
             read >> send_2_procs [0];
         }
+
         point->set_point (coords, send_2_procs, global_num, label, num_tags);
         list_of_points.push_back (point);
     }

@@ -1,12 +1,6 @@
 
-file(GLOB_RECURSE LYRA_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
-file(GLOB_RECURSE LYRA_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
-
-add_executable(Lyra ${LYRA_SOURCE_FILES} ${LYRA_HEADER_FILES})
-target_link_libraries(Lyra ${MPI_LIBRARIES})
-
-set_target_properties(Lyra PROPERTIES COMPILE_FLAGS "${MPI_COMPILE_FLAGS} ${CMAKE_CXX_FLAGS}")
-set_target_properties(Lyra PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS}")
+file(GLOB_RECURSE LYRA_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/common_lyra/*.cpp)
+file(GLOB_RECURSE LYRA_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/common_lyra/*.hpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -33,3 +27,14 @@ if(BUILD_DOC)
 else(BUILD_DOC)
     message("-- Build documentation OFF")
 endif(BUILD_DOC)
+
+
+add_executable(MultiParts ${LYRA_SOURCE_FILES} ${LYRA_HEADER_FILES} multiparts/main.cpp)
+target_link_libraries(MultiParts ${MPI_LIBRARIES})
+set_target_properties(MultiParts PROPERTIES COMPILE_FLAGS "${MPI_COMPILE_FLAGS} ${CMAKE_CXX_FLAGS}")
+set_target_properties(MultiParts PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS}")
+
+add_executable(Solve ${LYRA_SOURCE_FILES} ${LYRA_HEADER_FILES} solve/main.cpp)
+target_link_libraries(Solve ${MPI_LIBRARIES})
+set_target_properties(Solve PROPERTIES COMPILE_FLAGS "${MPI_COMPILE_FLAGS} ${CMAKE_CXX_FLAGS}")
+set_target_properties(Solve PROPERTIES LINK_FLAGS "${MPI_LINK_FLAGS}")

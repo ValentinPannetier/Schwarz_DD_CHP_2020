@@ -114,7 +114,9 @@ build_meshes (string input)
             end                  = boundary_global_indices [i + 2];
             proc                 = "proc_num_" + to_string (i) + ".In";
             ofstream write_mesh (proc.c_str ());
+
             write_mesh << num_lines * (end - start + 1) << endl;
+
             for (int j = start; j <= end; j++)
             {
                 if (j == start)  //bord gauche physique
@@ -180,16 +182,19 @@ build_meshes (string input)
                 }
             }
         }
-
         else if (i == num_procs - 1)
         {
             int column_to_send_left;
             start               = boundary_global_indices [2 * (i - 1) + 1];
             column_to_send_left = boundary_global_indices [2 * (i - 1) + 2];
             end                 = boundary_global_indices [2 * (i - 1) + 3];
-            proc                = "proc_num_" + to_string (i) + ".In";
+
+            proc = "proc_num_" + to_string (i) + ".In";
+
             ofstream write_mesh (proc.c_str ());
+
             write_mesh << num_lines * (end - start + 1) << endl;
+
             for (int j = start; j <= end; j++)
             {
                 if (j == start)  //bord gauche fictif
@@ -213,7 +218,9 @@ build_meshes (string input)
                 else if (j == end)  //bord de droite physique
                 {
                     for (int k = 0; k < num_lines; k++)
-                    { write_mesh << j * delta_x << " " << k * delta_y << " " << 0 << " " << k + j * num_lines << boundary_physical << " " << 0 << endl; }
+                    {
+                        write_mesh << j * delta_x << " " << k * delta_y << " " << 0 << " " << k + j * num_lines << boundary_physical << " " << 0 << endl;
+                    }
                 }
                 else if (j == column_to_send_left)
                 {
@@ -254,7 +261,6 @@ build_meshes (string input)
                 }
             }
         }
-
         else
         {
             int column_to_send_left;
@@ -263,8 +269,11 @@ build_meshes (string input)
             column_to_send_left  = boundary_global_indices [2 * (i - 1) + 2];
             column_to_send_right = boundary_global_indices [2 * (i - 1) + 3];
             end                  = boundary_global_indices [2 * (i - 1) + 4];
-            proc                 = "proc_num_" + to_string (i) + ".In";
+
+            proc = "proc_num_" + to_string (i) + ".In";
+
             ofstream write_mesh (proc.c_str ());
+
             for (int j = start; j <= end; j++)
             {
                 if (j == start)  //bord gauche fictif
