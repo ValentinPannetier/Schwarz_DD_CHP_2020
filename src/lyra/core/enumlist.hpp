@@ -1,5 +1,5 @@
-#ifndef ENUMLIST_HPP
-#define ENUMLIST_HPP
+#ifndef SRC_LYRA_CORE_ENUMLIST_HPP
+#define SRC_LYRA_CORE_ENUMLIST_HPP
 
 typedef enum
 {
@@ -52,4 +52,4 @@ typedef enum
     SOLVER_BICGSTAB
 } STYPE;
 
-#endif  // ENUMLIST_HPP
+#endif /* SRC_LYRA_CORE_ENUMLIST_HPP */

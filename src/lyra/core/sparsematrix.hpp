@@ -1,13 +1,13 @@
-#ifndef SPARSEMATRIX_HPP
-#define SPARSEMATRIX_HPP
+#ifndef SRC_LYRA_CORE_SPARSEMATRIX_HPP
+#define SRC_LYRA_CORE_SPARSEMATRIX_HPP
 
 #include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <vector>
 
-#include "../Tools/tools.hpp"
-#include "../lyra_common.hpp"
+#include "common.hpp"
+#include "tools.hpp"
 
 template <typename T>
 class Triplet
@@ -281,4 +281,4 @@ private:
     SparseMatrix (const SparseMatrix &) = delete;
 };
 
-#endif  // SPARSEMATRIX_HPP
+#endif /* SRC_LYRA_CORE_SPARSEMATRIX_HPP */

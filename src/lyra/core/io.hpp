@@ -1,14 +1,15 @@
-
-#include "io.hpp"
+#ifndef SRC_LYRA_CORE_IO_HPP
+#define SRC_LYRA_CORE_IO_HPP
 
 #include <fstream>
 #include <iomanip>
 
-#include "../LyraMPI/lyrampi.hpp"
-#include "../lyra_common.hpp"
+#include "common.hpp"
+#include "mesh.hpp"
 
+template <typename T>
 error_t
-Read (std::string filename, Mesh<real_t> * mesh)
+Read (std::string filename, Mesh<T> * mesh)
 {
     std::ifstream file (filename);
 
@@ -28,7 +29,7 @@ Read (std::string filename, Mesh<real_t> * mesh)
     ul_t tag      = 0;
     for (ul_t id = 0; id < numPoints; ++id)
     {
-        Point<real_t> * p = new Point<real_t>;
+        Point<T> * p = new Point<T>;
 
         file >> p->x >> p->y >> p->z >> p->globalId >> tag >> numProcs;
 
@@ -46,8 +47,8 @@ Read (std::string filename, Mesh<real_t> * mesh)
     file >> numCells >> std::ws;
     mesh->SetNumberOfCells (numCells);
 
-    ul_t           id1, id2, id3, id4;
-    Point<real_t> *pt1, *pt2, *pt3, *pt4;
+    ul_t      id1, id2, id3, id4;
+    Point<T> *pt1, *pt2, *pt3, *pt4;
     //
     //      4 ----- 3
     //      |       |
@@ -79,8 +80,9 @@ Read (std::string filename, Mesh<real_t> * mesh)
     return EXIT_SUCCESS;
 }
 
+template <typename T>
 error_t
-Write (Mesh<real_t> * mesh, std::string filename)
+Write (Mesh<T> * mesh, std::string filename)
 {
     // MEDIT FILE
     // ne pas mettre les uppercase ni la notation scientifique, il ne les lit pas
@@ -98,7 +100,7 @@ Write (Mesh<real_t> * mesh, std::string filename)
 
     for (ul_t id = 0; id < numPoints; ++id)
     {
-        Point<real_t> * p = mesh->GetPoint (id);
+        Point<T> *  p = mesh->GetPoint (id);
         file << SPC p->x << SPC p->y << SPC p->z << std::endl;
     }
 
@@ -106,7 +108,7 @@ Write (Mesh<real_t> * mesh, std::string filename)
     file << mesh->GetNumberOfCells () << std::endl;
     for (ul_t id = 0; id < numPoints; ++id)
     {
-        Point<real_t> * p = mesh->GetPoint (id);
+        Point<T> * p = mesh->GetPoint (id);
 
         if (p->CanForward ())
         {
@@ -124,3 +126,5 @@ Write (Mesh<real_t> * mesh, std::string filename)
 
     return EXIT_SUCCESS;
 }
+
+#endif /* SRC_LYRA_CORE_IO_HPP */

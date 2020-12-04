@@ -1,7 +1,7 @@
-#ifndef POINT_HPP
-#define POINT_HPP
+#ifndef SRC_LYRA_CORE_POINT_HPP
+#define SRC_LYRA_CORE_POINT_HPP
 
-#include "../lyra_common.hpp"
+#include "common.hpp"
 #include "enumlist.hpp"
 
 template <typename T>
@@ -38,4 +38,4 @@ struct Point
     }
 };
 
-#endif  // POINT_HPP
+#endif /* SRC_LYRA_CORE_POINT_HPP */

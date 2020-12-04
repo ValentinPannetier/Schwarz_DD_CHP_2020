@@ -1,12 +1,12 @@
-#ifndef MESH_HPP
-#define MESH_HPP
+#ifndef SRC_LYRA_CORE_MESH_HPP
+#define SRC_LYRA_CORE_MESH_HPP
 
 #include <iostream>
 #include <tuple>
 #include <utility>
 #include <vector>
 
-#include "../lyra_common.hpp"
+#include "common.hpp"
 #include "enumlist.hpp"
 #include "point.hpp"
 
@@ -116,4 +116,4 @@ operator<< (std::ostream & flux, const Mesh<T> & mesh)
     return flux;
 }
 
-#endif  // MESH_HPP
+#endif /* SRC_LYRA_CORE_MESH_HPP */

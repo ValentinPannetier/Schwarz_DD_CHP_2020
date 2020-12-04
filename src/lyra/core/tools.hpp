@@ -1,5 +1,5 @@
-#ifndef TOOLS_HPP
-#define TOOLS_HPP
+#ifndef SRC_LYRA_CORE_TOOLS_HPP
+#define SRC_LYRA_CORE_TOOLS_HPP
 
 #include <ostream>
 #include <vector>
@@ -71,4 +71,4 @@ operator+ (const std::vector<T> & a, const std::vector<T> & b)
     return result;
 }
 
-#endif  // TOOLS_HPP
+#endif /* SRC_LYRA_CORE_TOOLS_HPP */

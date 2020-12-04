@@ -6,7 +6,8 @@
 #include <iostream>
 #include <string>
 
-#include "../common_lyra/lyra.hpp"
+#include "../core/core.hpp"
+#include "../mpi/lyra_mpi.hpp"
 
 static error_t error;
 

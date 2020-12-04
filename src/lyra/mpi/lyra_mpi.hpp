@@ -1,11 +1,11 @@
-#ifndef LYRAMPI_HPP
-#define LYRAMPI_HPP
+#ifndef SRC_LYRA_MPI_LYRA_MPI_HPP
+#define SRC_LYRA_MPI_LYRA_MPI_HPP
 
 #include <mpi.h>
 
 #include <ostream>
 
-#include "../lyra_common.hpp"
+#include "../core/common.hpp"
 
 #define LYRA_PROC ProcMe
 #define LYRA_ASK  ((LYRA_PROC == nullptr) || (LYRA_PROC->rank == 0))
@@ -27,4 +27,4 @@ LyraInit (int * argc, char *** argv);
 void
 LyraFinalize ();
 
-#endif  // LYRAMPI_HPP
+#endif /* SRC_LYRA_MPI_LYRA_MPI_HPP */

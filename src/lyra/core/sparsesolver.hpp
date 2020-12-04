@@ -1,9 +1,9 @@
-#ifndef SPARSESOLVER_HPP
-#define SPARSESOLVER_HPP
+#ifndef SRC_LYRA_CORE_SPARSESOLVER_HPP
+#define SRC_LYRA_CORE_SPARSESOLVER_HPP
 
-#include "../Data/enumlist.hpp"
-#include "../SparseMatrix/sparsematrix.hpp"
-#include "../lyra_common.hpp"
+#include "common.hpp"
+#include "enumlist.hpp"
+#include "sparsematrix.hpp"
 
 #define DOT(A, B) std::inner_product (A.begin (), A.end (), B.begin (), 0.0)
 
@@ -228,4 +228,4 @@ public:
         return x;
     }
 };
-#endif  // SPARSESOLVER_HPP
+#endif /* SRC_LYRA_CORE_SPARSESOLVER_HPP */

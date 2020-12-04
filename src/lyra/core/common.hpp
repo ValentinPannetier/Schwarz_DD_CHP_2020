@@ -1,5 +1,5 @@
-#ifndef LYRA_COMMON_HPP
-#define LYRA_COMMON_HPP
+#ifndef SRC_LYRA_CORE_COMMON_HPP
+#define SRC_LYRA_CORE_COMMON_HPP
 
 // Lyra type def
 typedef double        real_t;
@@ -53,4 +53,4 @@ typedef int           error_t;
 #define WARNING std::cout << COLOR_YELLOW << "Warning : "
 #endif
 
-#endif  // LYRA_COMMON_HPP
+#endif /* SRC_LYRA_CORE_COMMON_HPP */

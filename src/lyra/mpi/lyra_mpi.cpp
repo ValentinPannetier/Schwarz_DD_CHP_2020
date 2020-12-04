@@ -1,4 +1,4 @@
-#include "lyrampi.hpp"
+#include "lyra_mpi.hpp"
 
 Proc * LYRA_PROC = nullptr;
 
