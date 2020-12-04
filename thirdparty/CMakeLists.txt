@@ -75,7 +75,6 @@ if (DOWNLOAD_SCOTCH)
     PATCH_COMMAND ""
     
     #   PREFIX "${CMAKE_BINARY_DIR}/Scotch"        
-    DEPENDS GKlib
 
     #   BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Scotch
     #   CONFIGURE_COMMAND pwd && make config shared=1 cc=gcc prefix=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Metis gklib_path=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/GKlib
