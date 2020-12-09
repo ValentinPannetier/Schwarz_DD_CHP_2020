@@ -10,6 +10,8 @@
 #define LYRA_PROC ProcMe
 #define LYRA_ASK  ((LYRA_PROC == nullptr) || (LYRA_PROC->rank == 0))
 
+#define LYRA_RANK (LYRA_PROC ? LYRA_PROC->rank : "")
+
 struct Proc
 {
     int rank  = 0;

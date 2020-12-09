@@ -31,12 +31,12 @@ std::function<real_t (Point<real_t> *, real_t)> h = [] (Point<real_t> * p, real_
 int
 main (int argc, char ** argv)
 {
-    // LyraInit (&argc, &argv);
+    LyraInit (&argc, &argv);
 
     if (LYRA_ASK)
     {
         std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
-        std::cout << COLOR_BLUE << REVERSE << "\tWelcome in Lyra !" << COLOR_DEFAULT << " You are running on " << (LYRA_PROC ? LYRA_PROC->nproc : 0) << " procs." << ENDLINE;
+        std::cout << COLOR_BLUE << REVERSE << "\tWelcome in Solver-Lyra !" << COLOR_DEFAULT << " You are running on " << (LYRA_PROC ? LYRA_PROC->nproc : 0) << " procs." << ENDLINE;
         std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
     }
 
@@ -49,10 +49,16 @@ main (int argc, char ** argv)
     Mesh<real_t> mesh;
     std::string  filename = argv [1];
 
+    filename += ".";
+    filename += std::to_string (LYRA_PROC->rank);
+    filename += ".lyra";
+
     error = Read (filename, &mesh);
     USE_ERROR (error);
 
-    STATUS << "read mesh " << mesh << ENDLINE;
+    STATUS << COLOR_BLUE << "[" << LYRA_PROC->rank << "] " << COLOR_DEFAULT << "read mesh " << mesh << ENDLINE;
+
+    MPI_Barrier (MPI_COMM_WORLD);
 
     // Generate the matrix of the problem d_t u - D * Laplacian(u) = f on this proc
 
@@ -92,13 +98,31 @@ main (int argc, char ** argv)
 
     matrix.SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
 
-    STATUS << "fill matrix with NNZ = " << matrix.NonZeros () << ENDLINE;
+    STATUS << COLOR_BLUE << "[" << LYRA_PROC->rank << "] " << COLOR_DEFAULT << "fill matrix with NNZ = " << matrix.NonZeros () << ENDLINE;
 
     // Make Dirichlet condition ?
 
-    error = Write (&mesh, "test.mesh");
+
+
+    // OUPUT
+    size_t pos = filename.find (".lyra");
+    if (pos != std::string::npos)
+        filename.erase (pos, 5);
+
+    MPI_Barrier (MPI_COMM_WORLD);
+
+    if (LYRA_ASK)
+    {
+        std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
+        INFOS << "Output :" << ENDLINE;
+    }
+
+    error = Write (&mesh, filename + ".out.mesh");
     USE_ERROR (error);
 
-    // LyraFinalize ();
+    error = WriteBBOnProcs (&mesh, filename + ".out.bb");
+    USE_ERROR (error);
+
+    LyraFinalize ();
     return EXIT_SUCCESS;
 }

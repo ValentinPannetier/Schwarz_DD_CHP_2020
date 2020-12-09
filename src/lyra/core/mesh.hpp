@@ -93,6 +93,17 @@ public:
         return m_points.size ();
     }
 
+    LYRA_INLINE
+    ul_t
+    GetNumberOfEdges () const
+    {
+        ul_t counter = 0;
+        for (Point<T> * p : m_points)
+            counter += p->NumberOfNeighs ();
+
+        return counter;
+    }
+
     template <typename U>
     friend std::ostream &
     operator<< (std::ostream & flux, const Mesh<U> & mesh);

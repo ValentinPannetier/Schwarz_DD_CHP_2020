@@ -13,7 +13,7 @@ operator<< (std::ostream & flux, const Proc & proc)
 void
 LyraInit (int * argc, char *** argv)
 {
-    Proc * LYRA_PROC = new Proc ();
+    LYRA_PROC = new Proc ();
 
     MPI_Init (argc, argv);
 

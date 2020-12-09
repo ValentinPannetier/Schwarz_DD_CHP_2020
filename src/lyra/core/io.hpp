@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iomanip>
+#include <numeric>
 
 #include "common.hpp"
 #include "mesh.hpp"
@@ -15,7 +16,7 @@ Read (std::string filename, Mesh<T> * mesh)
 
     if (!file.is_open ())
     {
-        ERROR << "can not open " << filename << "please check it..." << std::endl;
+        ERROR << "can not open " << filename << " please check it..." << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -110,7 +111,7 @@ Write (Mesh<T> * mesh, std::string filename)
     {
         Point<T> * p = mesh->GetPoint (id);
 
-        if (p->CanForward ())
+        if (p->CanMakeCell ())
         {
             file << SPC p->localId + 1
                  << SPC p->neigh [D_RIGHT]->localId + 1
@@ -124,7 +125,111 @@ Write (Mesh<T> * mesh, std::string filename)
     file << "\nEnd" << std::endl;
     file.close ();
 
+    STATUS << filename << " created." << ENDLINE;
+
     return EXIT_SUCCESS;
 }
 
+template <typename T>
+error_t
+WriteBBOnProcs (Mesh<T> * mesh, std::string filename)
+{
+    // MEDIT BB FILE
+    // ne pas mettre les uppercase ni la notation scientifique, il ne les lit pas
+    std::ofstream file (filename);
+
+    ul_t numPoints = mesh->GetNumberOfPoints ();
+    file << "2 1 " << numPoints << " 2 " << std::endl;
+
+    for (ul_t id = 0; id < numPoints; ++id)
+    {
+        Point<T> * p    = mesh->GetPoint (id);
+        real_t     mean = std::accumulate (p->procsidx.begin (), p->procsidx.end (), 0) / static_cast<real_t> (p->procsidx.size ());
+
+        // real_t mean = std::accumulate (p->procsidx.begin (), p->procsidx.end (), 1);
+
+        // real_t mean = static_cast<real_t> (p->procsidx.size ());
+        file << mean << std::endl;
+    }
+
+    file.close ();
+    STATUS << filename << " created." << ENDLINE;
+
+    return EXIT_SUCCESS;
+}
+
+// for lyra-partitions
+template <typename T>
+error_t
+WriteLyraPartitions (Mesh<T> * mesh, ul_t nparts, std::string basename)
+{
+    ul_t numPoints = mesh->GetNumberOfPoints ();
+
+    for (ul_t idProc = 0; idProc < nparts; ++idProc)
+    {
+        std::ofstream file (basename + "." + std::to_string (idProc) + ".lyra");
+
+        std::vector<Point<T> *> meshOnProc;
+        ul_t                    numCellsOnMesh = 0;
+
+        for (ul_t idPoint = 0; idPoint < numPoints; ++idPoint)
+        {
+            Point<T> * p = mesh->GetPoint (idPoint);
+
+            if (p->OnTheProc (idProc))
+            {
+                p->localId = meshOnProc.size ();
+                meshOnProc.push_back (p);
+
+                if (p->CanMakeCellOnTheProc (idProc))
+                    numCellsOnMesh++;
+            }
+        }
+
+        ul_t numPointsOnMesh = meshOnProc.size ();
+
+        file << numPointsOnMesh << std::endl;
+
+        for (ul_t id = 0; id < numPointsOnMesh; ++id)
+        {
+            Point<T> *  p = meshOnProc [id];
+            file << SPC p->x << SPC p->y << SPC p->z << std::flush;
+
+            file << SPC p->globalId << SPC 0 << SPC p->procsidx.size () << std::flush;
+
+            for (ul_t prochere : p->procsidx)
+                file << SPC prochere;
+
+            file << std::endl;
+        }
+
+        file << std::endl;
+        file << numCellsOnMesh << std::endl;
+        for (ul_t id = 0; id < numPointsOnMesh; ++id)
+        {
+            Point<T> * p = meshOnProc [id];
+
+            if (p->CanMakeCellOnTheProc (idProc))
+            {
+                file << SPC p->localId
+                     << SPC p->neigh [D_RIGHT]->localId
+                     << SPC p->neigh [D_RIGHT]->neigh [D_UP]->localId
+                     << SPC p->neigh [D_RIGHT]->neigh [D_UP]->neigh [D_LEFT]->localId
+                     << std::endl;
+            }
+        }
+
+        STATUS << std::string ((basename + "." + std::to_string (idProc) + ".lyra")) << " created." << COLOR_BLUE << "[target proc " << idProc << "]" << ENDLINE;
+
+        file.close ();
+    }
+
+    for (ul_t idPoint = 0; idPoint < numPoints; ++idPoint)
+    {
+        Point<T> * p = mesh->GetPoint (idPoint);
+        p->localId   = p->globalId;
+    }
+
+    return EXIT_SUCCESS;
+}
 #endif /* SRC_LYRA_CORE_IO_HPP */
