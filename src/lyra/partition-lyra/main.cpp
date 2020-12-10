@@ -4,58 +4,93 @@
 
 #include "../core/core.hpp"
 #include "cover.hpp"
-#include "forcustom.hpp"
+#include "forgrowing.hpp"
 #include "formetis.hpp"
+#include "forregularcheck.hpp"
+#include "forregularcols.hpp"
+#include "forregularrows.hpp"
 #include "forscotch.hpp"
 
 enum PARTITIONNER
 {
-    METIS  = 1,
-    SCOTCH = 2,
-    CUSTOM = 3
+    METIS   = 1,
+    SCOTCH  = 2,
+    GROWING = 3,
+    RCOLS   = 4,
+    RROWS   = 5,
+    RCHECK  = 6
 };
 
 static error_t      error;
 static int          nparts;
 static int          nrecover;
 static PARTITIONNER parter;
+static std::string  sparter;
 
-int
-main (int argc, char const ** argv)
+error_t
+ParseArguments (int argc, char const ** argv)
 {
     if (argc < 4)
     {
         ERROR << "use " << argv [0] << " filename.lyra nparts nrecover [options] " << ENDLINE;
-        ERROR << "options    -m : metis  [default]" << ENDLINE;
-        ERROR << "           -s : scotch " << ENDLINE;
-        // ERROR << "           -l : lyra-custom " << ENDLINE;
+        ERROR << "options -m  : metis " << COLOR_GREEN << "[default]" << ENDLINE;
+        ERROR << "        -s  : scotch " << ENDLINE;
+        ERROR << "        -g  : growing area with random seeds " << ENDLINE;
+        ERROR << "        -rc : regular columns " << ENDLINE;
+        ERROR << "        -rr : regular rows " << ENDLINE;
+        ERROR << "        -rb : regular checkerboards " << ENDLINE;
         return EXIT_FAILURE;
     }
 
     nparts   = std::stoi (argv [2]);
     nrecover = std::stoi (argv [3]);
 
-    parter = METIS;
+    parter  = METIS;
+    sparter = "Metis";
+
     if (argc > 4)
     {
         if (std::string (argv [4]) == "-s")
-            parter = SCOTCH;
-        else if (std::string (argv [4]) == "-l")
-            parter = CUSTOM;
+        {
+            parter  = SCOTCH;
+            sparter = "Scotch";
+        }
+        else if (std::string (argv [4]) == "-g")
+        {
+            parter  = GROWING;
+            sparter = "Growing Area With Random Seeds";
+        }
+        else if (std::string (argv [4]) == "-rc")
+        {
+            parter  = RCOLS;
+            sparter = "Regular Columns";
+        }
+        else if (std::string (argv [4]) == "-rr")
+        {
+            parter  = RROWS;
+            sparter = "Regular Rows";
+        }
+        else if (std::string (argv [4]) == "-rb")
+        {
+            parter  = RCHECK;
+            sparter = "Regular Checkerboards";
+        }
     }
+
+    return EXIT_SUCCESS;
+}
+
+int
+main (int argc, char const ** argv)
+{
+    error = ParseArguments (argc, argv);
+    USE_ERROR (error);
 
     std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
     std::cout << COLOR_BLUE << REVERSE << "\tWelcome in Partition-Lyra !" << ENDLINE;
     std::cout << COLOR_BLUE << std::string (60, '-') << ENDLINE;
 
-    if (parter == METIS)
-        std::cout << "METIS \tnparts = " << nparts << "\tnrecover = " << nrecover << ENDLINE;
-    else if (parter == SCOTCH)
-        std::cout << "SCOTCH \tnparts = " << nparts << "\tnrecover = " << nrecover << ENDLINE;
-    else if (parter == CUSTOM)
-        std::cout << "LYRA CUSTOM \tnparts = " << nparts << "\tnrecover = " << nrecover << ENDLINE;
-
-    // Partitionner
+    std::cout << sparter << "\tnparts = " << nparts << "\tnrecover = " << nrecover << ENDLINE;
 
     // MESH
     Mesh<real_t> mesh;
@@ -68,29 +103,25 @@ main (int argc, char const ** argv)
     if (pos != std::string::npos)
         filename.erase (pos, 5);
 
+    error = std::system (std::string ("rm -f " + filename + "." + std::to_string (nparts) + ".log").c_str ());
+    USE_ERROR (error);
+
     if (parter == METIS)
-    {
-        error = std::system (std::string ("rm -f " + filename + ".metis." + std::to_string (nparts) + ".log").c_str ());
-        USE_ERROR (error);
-
         error = MakeMetis (&mesh, filename, nparts);
-        USE_ERROR (error);
-
-        std::cout << "--> done [log in '" << filename << ".metis." << nparts << ".log']" << ENDLINE;
-    }
     else if (parter == SCOTCH)
-    {
         error = MakeScotch (&mesh, filename, nparts);
-        USE_ERROR (error);
+    else if (parter == GROWING)
+        error = MakeGrowing (&mesh, filename, nparts);
+    else if (parter == RROWS)
+        error = MakeRegularRows (&mesh, filename, nparts);
+    else if (parter == RCOLS)
+        error = MakeRegularColumns (&mesh, filename, nparts);
+    else if (parter == RCHECK)
+        error = MakeRegularCheckerboards (&mesh, filename, nparts);
 
-        std::cout << "--> done" << ENDLINE;
-    }
-    else if (parter == CUSTOM)
-    {
-        error = MakeCustom (&mesh, filename, nparts);
-        USE_ERROR (error);
-        std::cout << "--> done" << ENDLINE;
-    }
+    USE_ERROR (error);
+
+    std::cout << "--> done [log in '" << filename << "." << nparts << ".log']" << ENDLINE;
 
     // Une fois qu'on a partitionné on doit étendre les zones de procs, pour créer des recouvrements.
     error = MakeRecoveryZone (&mesh, nparts, nrecover);

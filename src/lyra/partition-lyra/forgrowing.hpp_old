@@ -1,5 +1,5 @@
-#ifndef SRC_LYRA_PARTITION_LYRA_FORCUSTOM_HPP
-#define SRC_LYRA_PARTITION_LYRA_FORCUSTOM_HPP
+#ifndef SRC_LYRA_PARTITION_LYRA_FORGROWING_HPP
+#define SRC_LYRA_PARTITION_LYRA_FORGROWING_HPP
 
 #include <iomanip>
 #include <iostream>
@@ -10,7 +10,7 @@
 
 template <typename T>
 error_t
-MakeCustom (Mesh<T> * mesh, std::string filename, ul_t nparts)
+MakeGrowing (Mesh<T> * mesh, std::string filename, ul_t nparts)
 {
     ul_t numPoints = mesh->GetNumberOfPoints ();
 
@@ -96,4 +96,4 @@ MakeCustom (Mesh<T> * mesh, std::string filename, ul_t nparts)
 
     return EXIT_SUCCESS;
 }
-#endif /* SRC_LYRA_PARTITION_LYRA_FORCUSTOM_HPP */
+#endif /* SRC_LYRA_PARTITION_LYRA_FORGROWING_HPP */

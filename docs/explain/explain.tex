@@ -1,0 +1,324 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+\graphicspath{ {Images/} }
+\usepackage[french]{babel}
+\frenchbsetup{StandardLists=true}
+\usepackage[light, math]{kurier}
+\usepackage[T1]{fontenc}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{MyBlue}{RGB}{0, 68, 128}
+\definecolor{MyYellow}{RGB}{255, 148, 0}
+\colorlet{MyRed}{red!60!black}
+\definecolor{MyGreen}{RGB}{38, 78, 54}
+
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage{amsmath, amssymb, amsthm}  
+\usepackage{upgreek} 
+\usepackage{esint}      
+\usepackage{stmaryrd}  
+\usepackage{ifthen}
+\usepackage{amstext, amsfonts, a4}
+\usepackage{dsfont}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=MyRed,
+	citecolor=MyBlue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+	bookmarks=true
+}
+\usepackage[ruled,vlined, french, onelanguage]{algorithm2e}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{pgffor}
+\usepackage{nicefrac} 
+\usepackage[labelfont=bf]{subcaption}
+\usepackage{cases}
+\usepackage[square, numbers]{natbib}
+\bibliographystyle{dinat}
+\usepackage[nottoc]{tocbibind}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small\textsc{Équation de la chaleur et conditions aux bords}}
+\lhead{\small\leftmark}
+\rfoot{Page \thepage}
+
+\usepackage{euscript}
+\usepackage{cancel}
+\usepackage{mathabx}
+% \usepackage{MnSymbol}
+
+\usepackage{import}
+\usepackage{xifthen}
+\usepackage{pdfpages}
+\usepackage{transparent}
+\usepackage{cancel}
+
+\newcommand{\incfig}[2]{%
+	\def\svgwidth{#1\textwidth}
+	\centering
+	\import{./figures/}{#2.pdf_tex}
+}
+
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{xargs}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{pdflscape}
+% \usepackage{minitoc}
+
+\makeatletter
+
+\newcommand*{\@rowstyle}{}
+
+\newcommand*{\rowstyle}[1]{% sets the style of the next row
+	\gdef\@rowstyle{#1}%
+	\@rowstyle\ignorespaces%
+}
+
+\newcolumntype{=}{% resets the row style
+	>{\gdef\@rowstyle{}}%
+}
+
+\newcolumntype{+}{% adds the current row style to the next column
+	>{\@rowstyle}%
+}
+
+\makeatother
+
+%\usepackage{multirow}
+%\usepackage{siunitx}
+%\usepackage{yfonts}
+
+%\numberwithin{equation}{section}
+%\renewcommand{\thechapter}{\Roman{chapter}}
+%\renewcommand{\theequation}{\thechapter.\arabic{equation}} 
+\newenvironment{refe}[1][]{%
+	\ifstrempty{#1}%
+	{}%
+	{\noindent\textsc{#1}}%
+	%   
+	\mdfsetup{
+		backgroundcolor=black!7,
+		linecolor=red!60!black,
+		linewidth=2pt,
+		innerleftmargin=10pt,
+		topline=false,
+		bottomline = false,
+		rightline=false,
+		leftline=true
+		%		frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+	}
+	\begin{mdframed}[] }{\end{mdframed}\vspace{3mm}}
+
+\newcommand{\velocity}{\overrightarrow{\boldsymbol{u}}}
+\newcommand{\myvector}[3]{\left[\begin{array}{c}
+		#1\\
+		#2\\
+		#3
+	\end{array}\right]}
+\newcommand{\grad}{\text{grad}~}
+%\newcommand{\divg}{\textcolor{MyRed}{\overrightarrow{\textbf{div}}}}
+\renewcommand{\div}[1][]{\textbf{div}\ifstrempty{#1}{~}{\left(#1\right)}}
+%\newcommand{\rot}{\text{rot}~}
+\newcommand{\rot}[1][]{\overrightarrow{\textbf{rot}}\ifstrempty{#1}{~}{\left(#1\right)}}
+\newcommand{\dmat}[1][]{{\partial_{\text{Mat}} \ifstrempty{#1}{~}{\left(#1\right)}}}
+\newcommand{\md}{\text{d}}
+\newcommand{\madd}{\mathbf{M}_{add}}
+\newcommand{\mass}[1]{\mathfrak{m}_{\mathfrak{#1}}}
+\newcommand{\vol}{\EuScript{V}}
+\newcommand{\surf}{\mathcal{S}}
+\newcommand{\lhs}{\hspace{3mm}}
+\newcommand{\thvector}[3]{#1 \lhs #2 \lhs #3}
+\newcommand{\id}{\mathcal{I}}
+\newcommand{\zero}{\mathcal{Z}}
+\newcommand{\nvec}{\boldsymbol{\vec{n}}}
+\newcommand{\gvec}{\boldsymbol{\vec{g}}}
+\newcommand{\piper}[1]{\left. #1 \right|}
+\newcommand{\fond}{\mathfrak{B}}
+\newcommand{\nvarchi}{\boldsymbol{P}_A}
+\newcommand{\archi}{\overrightarrow{\nvarchi}}
+%\newcommand{\bpression}{\breve{\Pi}}
+\newcommand{\bpression}{\Pi}
+\newcommand{\qvec}{\boldsymbol{\vec{q}}}
+\newcommand{\boldvec}[1]{\overrightarrow{\boldsymbol{#1}}}
+\newcommand{\onabla}[1]{\boldvec{\nabla_{#1}}}
+\newcommand{\mnabla}{\stackrel{\sim}{\smash{\nabla}\rule{0pt}{1.1ex}}}
+\newcommand{\mDelta}{\stackrel{\sim}{\smash{\Delta}\rule{0pt}{1.1ex}}}
+\newcommand{\cst}{\text{C}\text{\tiny st}}
+\newcommand{\mybullet}{\textcolor{MyRed}{\bullet}}
+\newcommand{\mytriangle}{\textcolor{MyRed}{\blacktriangleright}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\simmer}[1]{\overset{\sim}{#1}}
+\newcommand{\OLandau}[1]{\mathcal{O}\left(#1\right)}
+\newcommand{\mbrac}[1]{\llbracket #1 \rrbracket}
+\newcommand{\ampl}{A}
+\newcommand{\bld}[1]{\boldsymbol{#1}}
+\newcommand{\tostar}[1]{{{#1}^{*}}}
+\newcommand{\tostars}[2]{{{\tostar{#1}}_{\tostar{#2}}}}
+\newcommand{\scal}[2]{\left<#1,#2\right>}
+\newcommand{\tensor}[1]{\overline{\overline{#1}}}
+\newcommand{\zetasurf}{\underline{\bld{\zeta}}}
+\newcommand{\normalvec}{\boldvec{\mathfrak{n}}}
+\newcommand{\outngamma}{\boldvec{\mathtt{n}}}
+\newcommand{\outtgamma}{\boldvec{\mathtt{t}}}
+\newcommand{\dgamma}{\boldvec{\mathtt{d}}}
+\newcommand{\mapgamma}{\mathds{M}}
+\newcommand{\dunderline}[1]{\underline{\underline{#1}}}
+\newcommand{\pression}[2]{P_{\left\{#1, \bld{#2}\right\}}}
+\newcommand{\wall}[1]{\text{Wall}^{#1}}
+%\newcommand{\tostar}[1]{\overset{\widehat{*}}{#1}}
+\newcommand{\un}{\mathfrak{1}}
+\newcommand{\deux}{\mathfrak{2}}
+\newcommand{\aire}[1]{\left|#1\right|}
+\newcommand{\matcol}[3]{\text{Col}\left(#1, #2, #3\right)}
+\newcommand{\dx}{\Delta x}
+\newcommand{\dy}{\Delta y}
+\newcommand{\dt}{\Delta t}
+\newcommand{\vertcast}{{\#}}
+\newcommand{\coeff}[2]{\boldsymbol{\kappa}_{#1, #2}}
+\newcommand{\ccoeff}[2]{\boldsymbol{c}_{#1, #2}}
+\newcommand{\der}[2]{\boldsymbol{\mathcal{S}}_{#1, #2}}
+\DeclareMathOperator{\diag}{diag}
+
+\everymath{\displaystyle}
+
+\title{Équation de la chaleur et conditions aux bords}
+\author{Valentin Pannetier}
+
+\begin{document}
+\maketitle
+\noindent \textbf{Équation de la chaleur}
+\begin{equation}
+    \partial_t u - D \Delta u = f
+\end{equation}
+$D$ coefficient de diffusité thermique. Une fois discrétisée, on obtient des matrices représentant les opérateurs. On note $[\Delta]$ la matrice du Laplacien et $T$ la matrice de la dérivée temporelle.\\
+
+\noindent \textbf{Rappel développement de Taylor}\\
+Soit $u$ une fonction différentiable en $z_0$ et $z_0+\alpha$, on a pour tout $n$ dans $\mathbb{N}$
+\begin{equation}
+    u(z_0+\alpha) = \sum_{k=0}^{n} \frac{\alpha^k}{k!} \partial_{z}^k u(z_0) + \mathcal{O}(\alpha^n)
+\end{equation}
+qui est utilisé pour approcher la valeur de $u(z_0+\alpha)$ avec une combinaison des valeurs des dérivées $\partial_z^k u(z_0)$. Cette relation est utilisé dans la méthode des différences finies pour obtenir plusieurs relations. On peut par exemple voir le fameux taux d'accroissement
+\begin{align}
+    \frac{u(z_0 + \alpha) - u(z_0)}{\alpha} &=  \frac{\left[\sum_{k=0}^{n} \frac{\alpha^k}{k!} \partial_{z}^k u(z_0) + \mathcal{O}(\alpha^n)\right] - u(z_0)}{\alpha}\\
+    \intertext{En scindant la somme on obtient}
+    &= \frac{\left[\underbrace{\frac{\alpha^0}{0!}\partial_z^0u(z_0)}_{=u(z_0)}+ \sum_{k=1}^{n} \frac{\alpha^k}{k!} \partial_{z}^k u(z_0) + \mathcal{O}(\alpha^n)\right] - u(z_0)}{\alpha}\\
+    \intertext{C'est-à-dire}
+    &=\sum_{k=1}^{n} \frac{\alpha^{k-1}}{k!} \partial_{z}^k u(z_0) + \mathcal{O}(\alpha^{n-1})\\
+    \intertext{En scindant de nouveau}
+    &= \underbrace{\frac{\alpha^{0}}{1!} \partial_{z}^1 u(z_0)}_{\partial_z u(z_0)} + \underbrace{\sum_{k=2}^{n} \frac{\alpha^{k-1}}{k!} \partial_{z}^k u(z_0) + \mathcal{O}(\alpha^{n-1})}_{\mathcal{O}(\alpha^{1}}\\
+    &= \partial_z u(z_0) + \mathcal{O}(\alpha^{1})\\ &\approx \partial_z u(z_0)
+\end{align}
+On dit alors que l'on peut approcher $\partial_z u(z_0)$ grâce à $\frac{u(z_0 + \alpha) - u(z_0)}{\alpha}$ à l'ordre $1$ (c'est la dernière ligne avec le $\mathcal{O}(\alpha^{1})$) sur le stencil $z_0+\alpha, z_0$.\\
+
+Une liste non exhaustive des approximations des dérivées avec des stencils (liste des points que l'on prend pour approximer une valeur en $z_0$, par exemple $z_0-\alpha, z_0, z_0+\alpha$) est donnée ici \url{https://en.wikipedia.org/wiki/Finite_difference_coefficient}.\\
+
+\noindent \textbf{La dérivée temporelle}\\
+La dérivée temporelle est particulière dans le sens où le stencil que l'on prend est temporel et que pour approcher la valeur de $\partial_t u(t)$ on ne peut pas prendre de valeurs qui n'ont pas été calculée encore. On a une boucle sur le temps pour avoir les valeurs successives de $u$ : $u^0, u^1, u^2, \cdots$. Mais si on veut approcher $u^3$ (ie la solution $u$ qui est solution d'un équation faisant intervenir une dérivée temporelle) on ne peut que se servir des valeurs $u^k$ déjà calculées ! On parle alors de stencils décentrés. Par exemple on peut pour calculer en $t_{0}$ (en prenant $z_0 = t_0$ et $\alpha = \dt$):
+\begin{equation}
+    \partial_t u(x, t_0) = \frac{u(x, t_0) - u(x, t_0 - \dt)}{\dt} + \mathcal{O}(\dt^1)\label{eq:time}
+\end{equation}
+\begin{equation}
+    \partial_t u(x, t_0) = \frac{\frac{3}{2}u(x, t_0) -2 u(x, t_0 - \dt) + \frac{1}{2}u(x, t_0 - 2\dt)}{\dt} + \mathcal{O}(\dt^2)
+\end{equation}
+\begin{equation}
+    \partial_t u(x, t_0) = \frac{\frac{11}{6}u(x, t_0) -3 u(x, t_0 - \dt) + \frac{3}{2}u(x, t_0 - 2\dt) - \frac{1}{3}u(x, t_0-3\dt)}{\dt} + \mathcal{O}(\dt^3)
+\end{equation}
+Ce sont les trois premières lignes du tableau \url{https://en.wikipedia.org/wiki/Finite_difference_coefficient#Backward_finite_difference}!\\
+
+\noindent \textbf{Le Laplacien}\\
+On rappelle que le Laplacien de $u$ s'écrit comme $\Delta u := \partial_x^2 u + \partial_y^2 u$. Il nous faut donc approcher les des deux dérivées secondes.\\
+Travaillons donc uniquement sur $\partial_x^2 u$ (la dérivée seconde selon $y$ fonctionne exactement pareil, et il suffit de faire une somme des deux approximations obtenues pour approcher le Lalplacien de $u$).\\
+Habituellement, $\partial_x^2 u$ est approchée comme : 
+\begin{equation}
+    \partial_x^2 u (x_0, y_0) = \frac{u(x_0 - h, y_0) - 2 u(x_0, y_0) + u(x_0+h, y_0)}{h^2} + \mathcal{O}(h^2) \label{eq:space}
+\end{equation}
+C'est la 5ieme ligne du tableau \url{https://en.wikipedia.org/wiki/Finite_difference_coefficient#Central_finite_difference}.\\
+
+\noindent \textbf{Finalité}\\
+Discrétiser l'équation de la chaleur avec la formule pour le temps \eqref{eq:time} et l'espace \eqref{eq:space}.\\
+\noindent Pour un point $(x_i, y_j, t_n)$, on note\\
+\begin{itemize}
+    \item $u_{ij}^n \approx u(x_i, y_j, t_n)$
+    \item $u_{i-1, j}^n \approx u(x_i - \dx, y_j, t_n)$
+    \item $u_{i+1, j}^n \approx u(x_i + \dx, y_j, t_n)$
+    \item $u_{i, j-1}^n \approx u(x_i, y_j - \dy, t_n)$
+    \item $u_{i, j+1}^n \approx u(x_i , y_j + \dy, t_n)$
+    \item $u_{i, j}^{n-1} \approx u(x_i, y_j, t_n - \dt)$
+\end{itemize}
+\noindent On obtient ainsi la discrétisation de l'équation de la chaleur :
+\begin{equation}
+    \frac{u_{i, j}^{n} - u_{i, j}^{n-1}}{\dt} - D\left[\frac{u_{i-1, j}^n - 2u_{ij}^n + u_{i+1, j}^n}{\dx^2} + \frac{u_{i, j-1}^n - 2u_{ij}^n + u_{i, j+1}^n}{\dy^2}\right] = f_{ij}^n
+\end{equation}
+ou encore
+\begin{equation}
+    \frac{u_{i, j}^{n}}{\dt} - D\left[\frac{u_{i-1, j}^n - 2u_{ij}^n + u_{i+1, j}^n}{\dx^2} + \frac{u_{i, j-1}^n - 2u_{ij}^n + u_{i, j+1}^n}{\dy^2}\right] = \frac{u_{i, j}^{n-1}}{\dt}  + f_{ij}^n
+\end{equation}
+On parle ici d'un schéma implicite (d'autres choix sont possibles, comme prendre la discrétisation du laplacien au temps $t_n - \dt$ et on obtient donc un schéma explicite !).\\
+\noindent On note $b = -\frac{D}{\dx^2}$, $c = -\frac{D}{\dy^2}$, $e = \frac{1}{\dt}$ et $a = e - b- c$ pour obtenir le schéma plus clair
+\begin{equation}
+    au_{ij}^n + b\left(u_{i-1, j}^n + u_{i+1, j}^n\right) +  c\left(u_{i, j-1}^n + u_{i, j+1}^n\right) = e u_{i, j}^{n-1} + f_{ij}^n
+\end{equation}
+Cette formule n'est valable que \textbf{si} les 4 points autour du point $(x_i, y_j)$ existent. Or les points qui sont sur le bord du domaine n'ont pas tous ces voisins.\\
+
+\noindent\textbf{Les conditions de Dirichlet}\\
+Les conditions de Dirichlet sont de la forme $u = g$ sur le bord du domaine avec $g$ une fonction.\\
+Il est assez simple d'imposer une condition de Dirichlet, en effet si le point (par exemple mais c'est valable pour tous les points) $(x_{i-1}, y_{j})$ est un point de bord alors
+il suffit de prendre le schéma
+\begin{equation}
+    au_{ij}^n + b\left(\boldsymbol{g_{i-1, j}^n} + u_{i+1, j}^n\right) +  c\left(u_{i, j-1}^n + u_{i, j+1}^n\right) = e u_{i, j}^{n-1} + f_{ij}^n
+\end{equation}
+et comme $g$ n'est pas une inconnue on obtient le schéma
+\begin{equation}
+    au_{ij}^n + bu_{i+1, j}^n +  c\left(u_{i, j-1}^n + u_{i, j+1}^n\right) = e u_{i, j}^{n-1} + f_{ij}^n - \underbrace{b\boldsymbol{g_{i-1, j}^n}}_{\text{condition de bord}}
+\end{equation}
+On peut faire ça pour n'importe quel point dont un point voisin est un point de bord !!\\
+
+
+\noindent\textbf{Les conditions de Neumann}\\
+Voir \url{https://www.math.uci.edu/~chenlong/226/FDM.pdf} pour une explication plus claire peut-être.\\
+Les conditions de Neumann sont de la forme $\partial_n u = g$ sur le bord du domaine avec $g$ une fonction.\\
+Le terme $\partial_n u$ désigne la dérivée normale de $u$ : si on a un vecteur normal au bord de la forme $\vec{n} = (n_x, n_y)$ alors $\partial_n u = \vec{n} \cdot \nabla u = n_x \partial_x u + n_y \partial_y u$.\\
+Il faut maintenant discrétiser les opérateurs de dérivée première en espace (le $\partial_xu$ et le $\partial_y u$). Il est habituel de prendre un schéma du même ordre que l'ordre qu'on a pris pour le Laplacien (c'est-à-dire 2). Or on a (voir le tableau dérivée centrée)
+\begin{equation}
+    \partial_x u(x_i, y_j, t_n) = \frac{u_{i+1, j}^n - u_{i-1, j}^n}{2\dx} + \mathcal{O}(\dx^2)
+\end{equation} 
+et
+\begin{equation}
+    \partial_y u(x_i, y_j, t_n) = \frac{u_{i, j+1}^n - u_{i, j-1}^n}{2\dy} + \mathcal{O}(\dy^2)
+\end{equation} 
+Donc 
+\begin{equation}
+    \partial_n u(x_i, y_j, t_n) \approx n_x \frac{u_{i+1, j}^n - u_{i-1, j}^n}{2\dx} + n_y \frac{u_{i, j+1}^n - u_{i, j-1}^n}{2\dy} = g_{ij}^n
+\end{equation}
+En général les normales $\vec{n}$ sont dans la direction de la grille (ie soit $n_x=0$ soit $n_y = 0$). Admettons ici que $n_y = 0$ et $n_x=1$ et que le point $x_i - \dx$ est le point de bord.\\
+On obtient donc
+\begin{equation}
+    u_{i+1, j}^n - u_{i-1, j}^n = 2\dx g_{ij}^n
+\end{equation}
+ou encore
+\begin{equation}
+    u_{i-1, j}^n = u_{i+1, j}^n - 2\dx g_{ij}^n
+\end{equation}
+Donc le schéma devient
+\begin{equation}
+    au_{ij}^n + b\left(\boldsymbol{u_{i+1, j}^n - 2\dx g_{ij}^n} + u_{i+1, j}^n\right) +  c\left(u_{i, j-1}^n + u_{i, j+1}^n\right) = e u_{i, j}^{n-1} + f_{ij}^n
+\end{equation}
+C'est-à-dire
+\begin{equation}
+    au_{ij}^n + \boldsymbol{2} u_{i+1, j}^n +  c\left(u_{i, j-1}^n + u_{i, j+1}^n\right) = e u_{i, j}^{n-1} + f_{ij}^n \boldsymbol{- 2b\dx g_{ij}^n}
+\end{equation}
+\end{document}
