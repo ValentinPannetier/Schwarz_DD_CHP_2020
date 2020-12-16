@@ -1,8 +1,11 @@
 #ifndef SRC_LYRA_CORE_TOOLS_HPP
 #define SRC_LYRA_CORE_TOOLS_HPP
 
+#include <functional>
 #include <ostream>
 #include <vector>
+
+#include "mesh.hpp"
 
 template <typename T>
 void
@@ -69,6 +72,32 @@ operator+ (const std::vector<T> & a, const std::vector<T> & b)
         result [i] += b [i];
 
     return result;
+}
+
+template <typename T>
+void
+Fun2Vec (std::vector<T> * vec, Mesh * mesh, std::function<T (Point *, T)> fun, T time = T (0x0))
+{
+    ul_t numPoints = mesh->GetNumberOfPoints ();
+    vec->resize (numPoints, T (0x0));
+
+    for (ul_t idPoint = 0; idPoint < numPoints; ++idPoint)
+        vec [idPoint] = fun (mesh->GetPoint (idPoint), time);
+
+    return;
+}
+
+template <typename T>
+void
+Fun2Vec (std::vector<T> * vec, Mesh * mesh, T value = T (0x0))
+{
+    ul_t numPoints = mesh->GetNumberOfPoints ();
+    vec->resize (numPoints, T (0x0));
+
+    for (ul_t idPoint = 0; idPoint < numPoints; ++idPoint)
+        vec [idPoint] = value;
+
+    return;
 }
 
 #endif /* SRC_LYRA_CORE_TOOLS_HPP */

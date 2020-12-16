@@ -1,38 +1,35 @@
 #ifndef SRC_LYRA_CORE_SPARSESOLVER_HPP
 #define SRC_LYRA_CORE_SPARSESOLVER_HPP
 
+#include <vector>
+
 #include "common.hpp"
-#include "enumlist.hpp"
-#include "sparsematrix.hpp"
 
 #define DOT(A, B) std::inner_product (A.begin (), A.end (), B.begin (), 0.0)
 
-template <typename T>
+class SparseMatrix;
+
 class SparseSolverBase
 {
 public:
-    explicit SparseSolverBase (const SparseMatrix<T> & matrix) : m_matrix (matrix)
-    {
-    }
+    explicit SparseSolverBase (const SparseMatrix & matrix);
+    ~SparseSolverBase ();
 
-    ~SparseSolverBase () {}
-
-    virtual std::vector<T>
-    Solve (const std::vector<T> & b) = 0;
+    virtual std::vector<real_t>
+    Solve (const std::vector<real_t> & b) = 0;
 
 protected:
-    const SparseMatrix<T> & m_matrix;
+    const SparseMatrix & m_matrix;
 
 private:
     SparseSolverBase (const SparseSolverBase &) = delete;
 };
 
-template <typename T>
-class SparseCG : public SparseSolverBase<T>
+class SparseCG : public SparseSolverBase
 {
 public:
-    using SparseSolverBase<T>::SparseSolverBase;
-    using SuperClass = SparseSolverBase<T>;
+    using SparseSolverBase::SparseSolverBase;
+    using SuperClass = SparseSolverBase;
 
     /**
      * @brief CG
@@ -55,75 +52,17 @@ public:
      * }
      * 
      * @param b 
-     * @return std::vector<T> 
+     * @return std::vector<real_t>
      */
-    std::vector<T>
-    Solve (const std::vector<T> & b) override
-    {
-        using Type = std::vector<T>;
-
-        T eps = 1e-10;
-
-        ul_t size = SuperClass::m_matrix.Size ();
-
-        Type x (size, 0.);
-
-        Type r = b;
-        for (ul_t rowid = 0; rowid < size; ++rowid)
-            r [rowid] -= SuperClass::m_matrix.RowProduct (x, rowid);
-
-        T rrk   = DOT (r, r);
-        T rrk1  = 0.0;
-        T alpha = 0.0;
-        T beta  = 0.0;
-
-        Type p = r;
-        Type Ap (size, 0.0);
-
-        for (ul_t rowid = 0; rowid < size; ++rowid)
-            Ap [rowid] = SuperClass::m_matrix.RowProduct (p, rowid);
-
-        ul_t iter;
-        T    err;
-        for (iter = 0; iter < size; ++iter)
-        {
-            alpha = rrk / DOT (p, Ap);
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                x [rowid] += alpha * p [rowid];
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                r [rowid] -= alpha * Ap [rowid];
-
-            rrk1 = DOT (r, r);
-
-            err = rrk1;
-            if (err < eps)
-                break;
-
-            beta = rrk1 / rrk;
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                p [rowid] = r [rowid] + beta * p [rowid];
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                Ap [rowid] = SuperClass::m_matrix.RowProduct (p, rowid);
-
-            rrk = rrk1;
-        }
-
-        INFOS << COLOR_BLUE << "Sparse solver : CG " << COLOR_DEFAULT << " [iter = " << iter << " / " << size << ", err = " << err << "/ " << eps << "]" << ENDLINE;
-
-        return x;
-    }
+    std::vector<real_t>
+    Solve (const std::vector<real_t> & b) override;
 };
 
-template <typename T>
-class SparseBiCGSTAB : public SparseSolverBase<T>
+class SparseBiCGSTAB : public SparseSolverBase
 {
 public:
-    using SparseSolverBase<T>::SparseSolverBase;
-    using SuperClass = SparseSolverBase<T>;
+    using SparseSolverBase::SparseSolverBase;
+    using SuperClass = SparseSolverBase;
 
     /**
      * @brief BiCGSTAB
@@ -154,78 +93,9 @@ public:
      * }
      * 
      * @param b 
-     * @return std::vector<T> 
+     * @return std::vector 
      */
-    std::vector<T>
-    Solve (const std::vector<T> & b) override
-    {
-        using Type = std::vector<T>;
-
-        T eps = 1e-20;
-
-        ul_t size = SuperClass::m_matrix.Size ();
-
-        Type x (size, 0.);
-
-        Type r = b;
-        for (ul_t rowid = 0; rowid < size; ++rowid)
-            r [rowid] -= SuperClass::m_matrix.RowProduct (x, rowid);
-
-        Type r0    = r;
-        T    rrk   = DOT (r, r);
-        T    rrk1  = 0.0;
-        T    alpha = 0.0;
-        T    beta  = 0.0;
-        T    omega = 0.0;
-
-        Type p = r;
-        Type Ap (size, 0.);
-
-        for (ul_t rowid = 0; rowid < size; ++rowid)
-            Ap [rowid] = SuperClass::m_matrix.RowProduct (p, rowid);
-
-        Type As (size, 0.0);
-        Type s (size, 0.0);
-
-        ul_t iter;
-        T    err;
-        for (iter = 0; iter < size; ++iter)
-        {
-            alpha = rrk / DOT (Ap, r0);
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                s [rowid] = r [rowid] - alpha * Ap [rowid];
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                As [rowid] = SuperClass::m_matrix.RowProduct (s, rowid);
-
-            omega = DOT (As, s) / DOT (As, As);
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                x [rowid] += alpha * p [rowid] + omega * s [rowid];
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                r [rowid] = s [rowid] - omega * As [rowid];
-
-            rrk1 = DOT (r, r0);
-            err  = DOT (r, r);
-            if (err < eps)
-                break;
-
-            beta = (alpha / omega) * (rrk1 / rrk);
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                p [rowid] = r [rowid] + beta * (p [rowid] - omega * Ap [rowid]);
-
-            for (ul_t rowid = 0; rowid < size; ++rowid)
-                Ap [rowid] = SuperClass::m_matrix.RowProduct (p, rowid);
-
-            rrk = rrk1;
-        }
-
-        INFOS << COLOR_BLUE << "Sparse solver : BiCGSTAB " << COLOR_DEFAULT << " [iter = " << iter << " / " << size << ", err = " << err << "/ " << eps << "]" << ENDLINE;
-
-        return x;
-    }
+    std::vector<real_t>
+    Solve (const std::vector<real_t> & b) override;
 };
 #endif /* SRC_LYRA_CORE_SPARSESOLVER_HPP */

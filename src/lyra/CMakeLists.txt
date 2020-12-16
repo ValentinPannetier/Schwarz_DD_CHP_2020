@@ -36,7 +36,9 @@ endif(BUILD_DOC)
 add_executable(partition-lyra 
 ${LYRA_CORE_SOURCE_FILES} 
 ${LYRA_CORE_HEADER_FILES} 
-partition-lyra/main.cpp)
+partition-lyra/cover.cpp
+partition-lyra/main.cpp
+)
 
 
 # Solver

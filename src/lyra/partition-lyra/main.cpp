@@ -4,12 +4,6 @@
 
 #include "../core/core.hpp"
 #include "cover.hpp"
-#include "forgrowing.hpp"
-#include "formetis.hpp"
-#include "forregularcheck.hpp"
-#include "forregularcols.hpp"
-#include "forregularrows.hpp"
-#include "forscotch.hpp"
 
 enum PARTITIONNER
 {
@@ -30,10 +24,10 @@ static std::string  sparter;
 error_t
 ParseArguments (int argc, char const ** argv)
 {
-    if (argc < 4)
+    if (argc < 5)
     {
         ERROR << "use " << argv [0] << " filename.lyra nparts nrecover [options] " << ENDLINE;
-        ERROR << "options -m  : metis " << COLOR_GREEN << "[default]" << ENDLINE;
+        ERROR << "options -m  : metis " << ENDLINE;
         ERROR << "        -s  : scotch " << ENDLINE;
         ERROR << "        -g  : growing area with random seeds " << ENDLINE;
         ERROR << "        -rc : regular columns " << ENDLINE;
@@ -44,9 +38,6 @@ ParseArguments (int argc, char const ** argv)
 
     nparts   = std::stoi (argv [2]);
     nrecover = std::stoi (argv [3]);
-
-    parter  = METIS;
-    sparter = "Metis";
 
     if (argc > 4)
     {
@@ -75,6 +66,23 @@ ParseArguments (int argc, char const ** argv)
             parter  = RCHECK;
             sparter = "Regular Checkerboards";
         }
+        else if (std::string (argv [4]) == "-m")
+        {
+            parter  = METIS;
+            sparter = "Metis";
+        }
+        else
+        {
+            ERROR << "unknown option " << COLOR_BLUE << std::string (argv [4]) << ENDLINE;
+            WARNING << "use " << argv [0] << " filename.lyra nparts nrecover [options] " << ENDLINE;
+            WARNING << "options -m  : metis " << ENDLINE;
+            WARNING << "        -s  : scotch " << ENDLINE;
+            WARNING << "        -g  : growing area with random seeds " << ENDLINE;
+            WARNING << "        -rc : regular columns " << ENDLINE;
+            WARNING << "        -rr : regular rows " << ENDLINE;
+            WARNING << "        -rb : regular checkerboards " << ENDLINE;
+            return EXIT_FAILURE;
+        }
     }
 
     return EXIT_SUCCESS;
@@ -93,8 +101,8 @@ main (int argc, char const ** argv)
     std::cout << sparter << "\tnparts = " << nparts << "\tnrecover = " << nrecover << ENDLINE;
 
     // MESH
-    Mesh<real_t> mesh;
-    std::string  filename = argv [1];
+    Mesh        mesh;
+    std::string filename = argv [1];
 
     error = Read (filename, &mesh);
     USE_ERROR (error);
@@ -130,8 +138,8 @@ main (int argc, char const ** argv)
     error = CheckCover (&mesh, nparts);
     USE_ERROR (error);
 
-    // error = WriteLyraPartitions (&mesh, nparts, filename + "." + std::to_string (nparts));
-    // USE_ERROR (error);
+    error = WriteLyraPartitions (&mesh, nparts, filename + "." + std::to_string (nparts));
+    USE_ERROR (error);
 
     error = Write (&mesh, filename + "." + std::to_string (nparts) + ".mesh");
     USE_ERROR (error);

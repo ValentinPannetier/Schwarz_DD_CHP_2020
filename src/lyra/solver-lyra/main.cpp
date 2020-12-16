@@ -16,15 +16,15 @@ real_t dx = 1.0;
 real_t dy = 1.0;
 real_t D  = 1.0;
 
-std::function<real_t (Point<real_t> *, real_t)> f = [] (Point<real_t> * p, real_t t) -> real_t {
+std::function<real_t (Point *, real_t)> f = [] (Point * p, real_t t) -> real_t {
     return p->x + p->y + p->z + t;
 };
 
-std::function<real_t (Point<real_t> *, real_t)> g = [] (Point<real_t> * p, real_t t) -> real_t {
+std::function<real_t (Point *, real_t)> g = [] (Point * p, real_t t) -> real_t {
     return p->x + p->y + p->z + t;
 };
 
-std::function<real_t (Point<real_t> *, real_t)> h = [] (Point<real_t> * p, real_t t) -> real_t {
+std::function<real_t (Point *, real_t)> h = [] (Point * p, real_t t) -> real_t {
     return p->x + p->y + p->z + t;
 };
 
@@ -46,8 +46,8 @@ main (int argc, char ** argv)
         return EXIT_FAILURE;
     }
 
-    Mesh<real_t> mesh;
-    std::string  filename = argv [1];
+    Mesh        mesh;
+    std::string filename = argv [1];
 
     filename += ".";
     filename += std::to_string (LYRA_PROC->rank);
@@ -70,28 +70,28 @@ main (int argc, char ** argv)
     real_t c_surdiagx = -D * (1.0 / (dx * dx));
     real_t c_surdiagy = -D * (1.0 / (dy * dy));
 
-    SparseMatrix<real_t> matrix;
-    std::vector<real_t>  second_member;
+    SparseMatrix        matrix;
+    std::vector<real_t> second_member;
 
     matrix.Init (mesh.GetNumberOfPoints ());
-    typename SparseMatrix<real_t>::TripletsList listOfTriplets;
+    TripletsList listOfTriplets;
 
     ul_t numOfPoints = mesh.GetNumberOfPoints ();
     second_member.resize (numOfPoints, 0.0);
 
     for (ul_t id = 0; id < numOfPoints; ++id)
     {
-        Point<real_t> * p = mesh.GetPoint (id);
+        Point * p = mesh.GetPoint (id);
 
-        listOfTriplets.push_back (Triplet<real_t> (id, id, c_diag));
+        listOfTriplets.push_back (Triplet (id, id, c_diag));
 
         for (DIR dir : std::vector<DIR> ({D_UP, D_BOTTOM}))
             if (p->neigh [dir])
-                listOfTriplets.push_back (Triplet<real_t> (id, p->neigh [dir]->localId, c_surdiagy));
+                listOfTriplets.push_back (Triplet (id, p->neigh [dir]->localId, c_surdiagy));
 
         for (DIR dir : std::vector<DIR> ({D_LEFT, D_RIGHT}))
             if (p->neigh [dir])
-                listOfTriplets.push_back (Triplet<real_t> (id, p->neigh [dir]->localId, c_surdiagx));
+                listOfTriplets.push_back (Triplet (id, p->neigh [dir]->localId, c_surdiagx));
 
         second_member [id] = f (p, 0.0);
     }
@@ -101,8 +101,6 @@ main (int argc, char ** argv)
     STATUS << COLOR_BLUE << "[" << LYRA_PROC->rank << "] " << COLOR_DEFAULT << "fill matrix with NNZ = " << matrix.NonZeros () << ENDLINE;
 
     // Make Dirichlet condition ?
-
-
 
     // OUPUT
     size_t pos = filename.find (".lyra");

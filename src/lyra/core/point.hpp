@@ -1,23 +1,25 @@
 #ifndef SRC_LYRA_CORE_POINT_HPP
 #define SRC_LYRA_CORE_POINT_HPP
 
+#include <algorithm>
+#include <vector>
+
 #include "common.hpp"
 #include "enumlist.hpp"
 
-template <typename T>
 struct Point
 {
-    T                 x         = 0.0;
-    T                 y         = 0.0;
-    T                 z         = 0.0;
+    real_t            x         = 0x0;
+    real_t            y         = 0x0;
+    real_t            z         = 0x0;
     ul_t              globalId  = 0;  // global id
     ul_t              localId   = 0;  // local id
     PTAG              tag       = PTAG::PT_DEFAULT;
-    Point<T> *        neigh [4] = {nullptr, nullptr, nullptr, nullptr};
+    Point *           neigh [4] = {nullptr, nullptr, nullptr, nullptr};
     std::vector<ul_t> procsidx  = {};
 
     LYRA_INLINE
-    Point<T> *
+    Point *
     operator[] (DIR d)
     {
         return neigh [d];
@@ -55,68 +57,23 @@ struct Point
         return count;
     }
 
-    LYRA_HARD_INLINE
     bool
-    OnTheProc (ul_t idproc)
-    {
-        for (ul_t value : procsidx)
-            if (idproc == value)
-                return true;
-        return false;
-    }
+    OnTheProc (ul_t idproc);
 
-    LYRA_INLINE
     bool
-    IsCompleteOnTheProc (ul_t idproc)
-    {
-        if (IsComplete () == false)
-            return false;
+    IsCompleteOnTheProc (ul_t idproc);
 
-        bool find = OnTheProc (idproc);
-
-        if (!find)
-            return false;
-
-        for (ul_t idneigh = 0; idneigh < 4; ++idneigh)
-        {
-            find = neigh [idneigh]->OnTheProc (idproc);
-
-            if (!find)
-                return false;
-        }
-
-        return true;
-    }
-
-    LYRA_INLINE
     bool
-    CanMakeCellOnTheProc (ul_t idproc)
-    {
-        if (IsComplete () == false)
-            return false;
+    CanMakeCellOnProc (ul_t idproc);
 
-        bool find = OnTheProc (idproc);
-        find      = find && neigh [D_RIGHT]->OnTheProc (idproc);
-        find      = find && neigh [D_RIGHT]->neigh [D_UP]->OnTheProc (idproc);
-        find      = find && neigh [D_RIGHT]->neigh [D_UP]->neigh [D_LEFT]->OnTheProc (idproc);
-
-        return find;
-    }
-
-    LYRA_INLINE
     bool
-    CanMakeCell ()
-    {
-        if (IsComplete () == false)
-            return false;
+    CanMakeCell ();
 
-        bool find = true;
-        find      = find && neigh [D_RIGHT];
-        find      = find && neigh [D_RIGHT]->neigh [D_UP];
-        find      = find && neigh [D_RIGHT]->neigh [D_UP]->neigh [D_LEFT];
+    bool
+    TotalMatchNeighsOnProc (ul_t idproc);
 
-        return find;
-    }
+    bool
+    MatchProcIdxNeighs ();
 };
 
 #endif /* SRC_LYRA_CORE_POINT_HPP */
