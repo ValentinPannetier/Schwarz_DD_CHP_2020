@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(SchwarzDD)
+project(LyraProject)
 include(FindPkgConfig)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -15,7 +15,14 @@ message(STATUS "Verbose mode : ${USE_VERBOSE}")
 
 if (USE_VERBOSE)
   add_definitions(-DVERBOSE)
-endif()
+endif(USE_VERBOSE)
+
+option(USE_MPI_BLOCKING "MPI Blocking mode" OFF)
+message(STATUS "MPI Blocking mode : ${USE_MPI_BLOCKING}")
+
+if (USE_MPI_BLOCKING)
+  add_definitions(-DMPI_BLOCKING)
+endif(USE_MPI_BLOCKING)
 
 set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build)
@@ -28,7 +35,5 @@ include_directories(${MPI_INCLUDE_PATH})
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty)
 
 # Add lyra
-add_subdirectory (${CMAKE_SOURCE_DIR}/src/lyra)
+add_subdirectory (${CMAKE_SOURCE_DIR}/src)
 
-# Add exec partition
-add_subdirectory (${CMAKE_SOURCE_DIR}/src/partition)

@@ -1,5 +1,5 @@
 OUTPUT_DIRECTORY        = @CMAKE_SOURCE_DIR@/docs/doc_doxygen
-INPUT                   = @CMAKE_SOURCE_DIR@/src/lyra
+INPUT                   = @CMAKE_SOURCE_DIR@/src
 EXCLUDE_PATTERNS        = *.txt
 PROJECT_NAME            = "Lyra"
 GENERATE_MAN            = YES
