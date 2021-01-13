@@ -38,9 +38,9 @@ The Lyra partitioner requires an input mesh in Lyra format (see the section on L
 **Be careful**, when you choose a Robin type condition, the corners on the partitions are treated as a Dirichlet condition.
 
 ### Options `$partitionner` (name of partitionner)
- - `-pm` or `--metis` use Metis, so Metis need to be download and build (see *To compile* part) 
- - `-ps` or `--scotch` use Scotch, so Scotch need to be download and build (see *To compile* part)
- - `-pv` or `--voronoi` equilibrate diagram of Voronoi. 
+ - `-pm` or `--metis` use Metis, so Metis needs to be downloaded and build (see *To compile* part) 
+ - `-ps` or `--scotch` use Scotch, so Scotch needs to be downloaded and build (see *To compile* part)
+ - `-pv` or `--voronoi` equilibrate Voronoi diagram. 
  - `-pc` or `--column` regular columns
  - `-pr` or `--row` regular rows
  - `-pb` or `--board` regular checkerboards
@@ -48,13 +48,13 @@ The Lyra partitioner requires an input mesh in Lyra format (see the section on L
 ## 🖥 solver-lyra
 `mpirun -np $n  ./solver-lyra ../data/test.$n` where `$n` is the number of processes on which to solve our problem (so this must also be the number of partitions created using `partition-lyra`).
 
-A lot of features can be disable directly (no options here) as `LyraCheckCommunications` or `WriteVTKFile` in `IterateSchwarz`. You can also choose many criteria as `numSchwarz` and `epsilon` in `main.cpp`. You can also change analytical solution in the same file.
+A lot of features can be disabled directly (no options here) as `LyraCheckCommunications` or `WriteVTKFile` in `IterateSchwarz`. You can also choose many criteria as `numSchwarz` and `epsilon` in `main.cpp`. You can also change analytical solution in the same file.
 
 ## 🗊 The Lyra mesh format
-No comments are possible if this type of file everything is read !
+No comments are possible in this type of file because everything is read !
 
     number-of-points
-    coor-x coor-y coor-z global-num tag tag-infos \\ for each points
+    coor-x coor-y coor-z global-num tag tag-infos \\ for each point
     ...
     
     number-of-cells
@@ -80,5 +80,5 @@ In addtion, we have a special value for `PT_ROBIN` which is the bitwise **OR** o
  > For example *1101101* is a `PT_SHARED` and `PT_VIRTUAL` and  `PT_SEND` and `PT_ROBIN`
  
  - tag-infos is only determined by `PT_SEND` or `PT_RECEIVE`
--- if `PT_SEND`  it's `number-of-receveirs [id-proc dir-normal-outward] ...`,
--- if `PT_RECEIVE` it's only `id-proc-sender`.
+ - if `PT_SEND`  it's `number-of-receveirs [id-proc dir-normal-outward] ...`,
+ - if `PT_RECEIVE` it's only `id-proc-sender`.
