@@ -14,8 +14,8 @@ real_t  dx         = 1.0;
 real_t  dy         = 1.0;
 real_t  D          = 1.0;
 error_t error      = EXIT_SUCCESS;
-real_t  epsilon    = 1e-15;
-ul_t    numSchwarz = 500;
+real_t  epsilon    = 1E-3;
+ul_t    numSchwarz = 5E5;
 
 //// Analytical solution
 // real_t
@@ -78,6 +78,8 @@ main (int argc, char **argv)
         MPI_USE_ERROR (EXIT_FAILURE)
     }
 
+    real_t begTime = MPI_Wtime ();
+
     Mesh        mesh;
     std::string filename = argv [1];
 
@@ -98,9 +100,9 @@ main (int argc, char **argv)
     if (LYRA_ASK)
         ENDFUN;
 
-    error = LyraCheckCommunications (&mesh);
-    MPI_USE_ERROR (error)
-    LYRA_BARRIER;
+    //    error = LyraCheckCommunications (&mesh);
+    //    MPI_USE_ERROR (error)
+    //    LYRA_BARRIER;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// Build system
@@ -140,9 +142,13 @@ main (int argc, char **argv)
         BEGIN << "Output" << ENDLINE;
 
     Write (&mesh, filename + ".out.mesh");
-    //    WriteBBOnProcs (&mesh, filename + ".out.bb");
+    WriteBBOnProcs (&mesh, filename + ".out.bb");
     WriteBBVectorOnProcs (&mesh, &solNum, filename + ".out.bb");
     WriteVTKFile (&mesh, filename + ".out.vtk", &solNum, &solAna);
+
+    real_t endTime = MPI_Wtime ();
+    if (LYRA_ASK)
+        INFOS << "Timer : " << std::fixed << endTime - begTime << " " << std::endl;
 
     LyraFinalize ();
     return EXIT_SUCCESS;

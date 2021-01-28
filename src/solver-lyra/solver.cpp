@@ -21,13 +21,16 @@ BuildSystem (SparseMatrix *matrix, std::vector<real_t> *secMember, Mesh *mesh)
     // d_x^2 u ~ (u_{i-1} - 2 u_i + u_{i+1}) / dx^2     --> order 2
     // d_y^2 u ~ (u_{j-1} - 2 u_j + u_{j+1}) / dy^2     --> order 2
 
-    matrix->Init (mesh->GetNumberOfPoints ());
-    TripletsList listOfTriplets;
-
     ul_t numOfPoints = mesh->GetNumberOfPoints ();
+
+    matrix->Init (numOfPoints);
+
+    TripletsList listOfTriplets;
+    listOfTriplets.reserve (numOfPoints);
 
     if (LYRA_ASK)
         BEGIN << "Fill matrix" << ENDLINE;
+
     // Matrice de Base
     for (ul_t id = 0; id < numOfPoints; ++id)
     {
@@ -61,12 +64,6 @@ BuildSystem (SparseMatrix *matrix, std::vector<real_t> *secMember, Mesh *mesh)
         listOfTriplets.push_back (Triplet (id, id, c_diag));
     }
 
-    std::ofstream outfile ("toto_" + std::to_string (ProcMe->rank) + ".txt");
-    outfile << "test test test test test" << std::endl;
-    outfile.close ();
-    matrix->PrintDenseView (outfile);
-    outfile.close ();
-
     matrix->SetFromTriplet (listOfTriplets.begin (), listOfTriplets.end ());
 
     STATUS << COLOR_BLUE << "[" << ProcMe->rank << "] " << COLOR_DEFAULT
@@ -93,12 +90,14 @@ IterateSchwarz (SparseMatrix *matrix, std::vector<real_t> *secMember, Mesh *mesh
     SparseSolverBase *solver = nullptr;
     ul_t              cursor = 0;
 
-    solNum->resize (mesh->GetNumberOfPoints (), 0x0);
+    ul_t numOfPoints = mesh->GetNumberOfPoints ();
+    solNum->resize (numOfPoints, 0x0);
+    std::vector<real_t> lastState (numOfPoints, 0x0);
+
     std::vector<real_t> valuesToSend (mesh->GetTotalNumberOfSenderPoints (), 0x0);
 
     // Cast all received values by procs
     std::vector<real_t> valuesToImposeVirtual (mesh->GetTotalNumberOfReceiverPoints (), 0x0);
-    std::vector<real_t> oldValuesToImposeVirtual = valuesToImposeVirtual;
 
     // physical values on this proc
     std::vector<real_t> valuesToImposePhysical (mesh->GetNumberOfPhysicalPoints (), 0x0);
@@ -128,11 +127,14 @@ IterateSchwarz (SparseMatrix *matrix, std::vector<real_t> *secMember, Mesh *mesh
             cursor += mesh->GetNumberOfReceiverPointsOnProc (idProc);
         }
 
+        lastState = *solNum;
+
         // Solve Part
         solver = new SparseBiCGSTAB (currMatrix);
         solver->SetPrefix ("[" + std::to_string (ProcMe->rank) + "]");
-        solver->SetTolerance (1e-25);
+        solver->SetTolerance (1e-10);
         solver->Solve (currSecMember, solNum);
+        delete solver;
 
         // Auto slice and take good values to send
         cursor = 0;
@@ -145,28 +147,25 @@ IterateSchwarz (SparseMatrix *matrix, std::vector<real_t> *secMember, Mesh *mesh
             cursor += mesh->GetNumberOfSenderPointsOnProc (idProc);
         }
 
-        oldValuesToImposeVirtual = valuesToImposeVirtual;
-
         // Send and Receive
         LyraSend (mesh, valuesToSend);
         LyraRecv (mesh, valuesToImposeVirtual);
 
-        for (ul_t id = 0; id < valuesToImposeVirtual.size (); ++id)
-            oldValuesToImposeVirtual [id] -= valuesToImposeVirtual [id];
+        real_t err = -1.0;
+        for (ul_t i = 0; i < numOfPoints; ++i)
+            err = std::max (err, std::abs (lastState [i] - (*solNum) [i]));
 
-        delete solver;
-        //        MPI_Barrier (MPI_COMM_WORLD);
-
-        real_t err    = DOT (oldValuesToImposeVirtual, oldValuesToImposeVirtual);
         real_t errsum = 0;
         MPI_Allreduce (&err, &errsum, 1, MPI_REAL_T, MPI_SUM, MPI_COMM_WORLD);
 
         WriteVTKFile (mesh, "file_" + std::to_string (ProcMe->rank) + "_" + std::to_string (it) + ".vtk", solNum,
                       solAna);
 
-        if (!(it % 2))
-            if (errsum < epsilon)
-                break;
+        if (LYRA_ASK)
+            INFOS << "It : " << SPC it << " | error : " << SPC errsum << ENDLINE;
+
+        if (errsum < epsilon)
+            break;
     }
 
     return it;
